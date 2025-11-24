@@ -44,7 +44,7 @@ Modul ini berperan dalam autentikasi pengguna dalam sign up maupun sign in. Saat
 
 
 ## Home Page (Khalisa)
-Modul ini berisi halaman utama ketika user telah berhasil sign up/sign in. Halaman ini akan berisi carousel event,  card pilihan lapangan yang ketika diklik akan menampilkan pop-up (modal) lapangan yang berisi deskripsi dan button untuk book lapangan. Selain itu, di halaman utama juga terdapat search bar dengan filter untuk mencari lapangan yang sesuai.
+Modul ini berisi halaman utama ketika user telah berhasil sign up/sign in. Halaman ini akan berisi carousel event,  card pilihan lapangan yang ketika diklik akan menampilkan pop-up (modal) lapangan yang berisi deskripsi dan button untuk book lapangan. Selain itu, di halaman utama juga terdapat search bar dengan filter untuk mencari lapangan yang sesuai dan adanya penambahan fitur pemilihan lapangan favorit user yang dikategorikan sebagai lapangan "dekat rumah", "dekat kantor", atau lainnya.
 
 
 ## Community (Evan)
