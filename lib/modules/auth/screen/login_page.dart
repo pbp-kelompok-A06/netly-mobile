@@ -95,7 +95,6 @@ class _LoginPageState extends State<LoginPage>{
                                             return "Email tidak boleh kosong!";
                                         }
 
-
                                         
 
                                         return null;
