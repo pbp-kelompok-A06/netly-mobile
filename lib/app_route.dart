@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:netly_mobile/modules/auth/view/login_page.dart';
+import 'package:netly_mobile/modules/auth/route/auth_route.dart';
 
 
 class AppRoutes {
-  static const login = '/login';
 
   static final Map<String, WidgetBuilder> routes = {
-    login: (context) => LoginPage(),
+    ...AuthRoutes.routes,
   };
 }
