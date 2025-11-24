@@ -32,9 +32,11 @@ https://drive.google.com/drive/folders/1ZavKO5MArsdd4mvhmcku6fB9GIWp51Ro?usp=sha
 # Tautan Web Aplikasi
 [https://evan-haryo-netly.pbp.cs.ui.ac.id/](url)
 
-# TIMELINE PEKERJAAN
+# Timeline Pekerjaan
 https://docs.google.com/spreadsheets/d/1vjy8Oa-lG54ZwlMTUrBfx4CQ659ORvYdx8pJW2HG2e0/edit?usp=sharing](url)
 
+# Tautan Figma
+https://www.figma.com/design/NKrUTgJaI3YfUvom0AVwPK/Untitled?node-id=0-1&t=zV5wKtPf4rfcJr77-1a.com/design/NKrUTgJaI3YfUvom0AVwPK/Untitled?node-id=0-1&t=zV5wKtPf4rfcJr77-1
 
 # Daftar Modul
 ## Autentikasi dan Profil Pengguna
