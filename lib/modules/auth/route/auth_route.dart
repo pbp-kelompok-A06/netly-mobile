@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:netly_mobile/modules/auth/view/login_page.dart';
+import 'package:netly_mobile/modules/auth/screen/login_page.dart';
 
 
 class AuthRoutes {
