@@ -6,6 +6,7 @@
 - Nisyyah Azzahra (2406495823)
 
 
+
 # Latar Belakang Aplikasi
 **Netly** adalah aplikasi yang dibuat untuk mempermudah pencarian dan pemesanan lapangan badminton yang semakin banyak diminati masyarakat luas. Melalui netly, pengguna dapat:
 - Mencari lapangan badminton berdasarkan lokasi, harga, dan ketersediaan.
@@ -27,6 +28,12 @@ Aplikasi ini menggunakan dataset dari https://ayo.co.id/venues. Pengambilan data
 - Link gambar
 ## Tautan dataset
 https://drive.google.com/drive/folders/1ZavKO5MArsdd4mvhmcku6fB9GIWp51Ro?usp=sharing
+
+# Tautan Web Aplikasi
+[https://evan-haryo-netly.pbp.cs.ui.ac.id/](url)
+
+# TIMELINE PEKERJAAN[
+https://docs.google.com/spreadsheets/d/1vjy8Oa-lG54ZwlMTUrBfx4CQ659ORvYdx8pJW2HG2e0/edit?usp=sharing](url)
 
 
 # Daftar Modul
@@ -70,3 +77,10 @@ Hak akses & fitur:
 - Melihat riwayat booking.
 - Mengikuti event/turnamen komunitas.
 - Berinteraksi / membuat forum di modul komunitas.
+
+# Alur Pengintegrasian Aplikasi Mobile dengan Sistem Web Sebelumnya
+1. Sistem web menyediakan endpoint yang dapat menerima request body dan mengembalikan response dalam bentuk JSON (JavaScript Object Notation)
+2. Sistem web menerapkan mekanisme CORS dan juga penyimpanan session serta cookies sehingga aplikasi eksternal (dalam hal ini adalah aplikasi mobile) dapat melakukan komunikasi dan proses autentikasi dapat berjalan di aplikasi eksternal
+4. Aplikasi mobile juga akan melakukan asynchronous request terhadap sistem web sebelumnya dan menampilkan hasilnya menggunakan FutureBuilder. Hal tersebut juga diikuti dengan penyimpanan autentikasi dengan CookieRequest sehingga user dapat tetap terautentikasi pada halaman yang membutuhkan proses autentikasi tersebut
+5. Aplikasi mobile pun, dalam hal ini flutter, menerapkan modelling terhadap request dan response JSON yang dilakukan secara berkala sehingga integritas dan konsistensi data tetap terjaga.
+
