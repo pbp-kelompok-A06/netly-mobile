@@ -33,7 +33,7 @@ https://drive.google.com/drive/folders/1ZavKO5MArsdd4mvhmcku6fB9GIWp51Ro?usp=sha
 [https://evan-haryo-netly.pbp.cs.ui.ac.id/](url)
 
 # Timeline Pekerjaan
-https://docs.google.com/spreadsheets/d/1vjy8Oa-lG54ZwlMTUrBfx4CQ659ORvYdx8pJW2HG2e0/edit?usp=sharing](url)
+https://docs.google.com/spreadsheets/d/1ps7Y-VIe4WkWgU2LCvHjXcCw6QSmWz5ySCnZWBD25xE/edit?usp=sharing
 
 # Tautan Figma
 https://www.figma.com/design/NKrUTgJaI3YfUvom0AVwPK/Untitled?node-id=0-1&t=zV5wKtPf4rfcJr77-1a.com/design/NKrUTgJaI3YfUvom0AVwPK/Untitled?node-id=0-1&t=zV5wKtPf4rfcJr77-1
