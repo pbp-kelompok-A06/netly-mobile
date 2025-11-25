@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/app_route.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,14 +15,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+
+      child: MaterialApp(
+        title: 'Netly',
+        theme: ThemeData(
+          
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        initialRoute: AuthRoutes.login,
+        routes: AppRoutes.routes,
       ),
-      initialRoute: AuthRoutes.login,
-      routes: AppRoutes.routes,
+      
     );
   }
 }
