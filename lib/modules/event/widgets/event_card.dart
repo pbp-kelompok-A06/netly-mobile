@@ -50,14 +50,14 @@ class EventCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.calendar_today, // Icon Kalender
+                        Icons.calendar_today, 
                         size: 14, 
-                        color: Color.fromARGB(255, 155, 184, 65), // Pakai warna tema (Hijau Netly)
+                        color: Color.fromARGB(255, 155, 184, 65), 
                       ),
-                      const SizedBox(width: 6), // Jarak antara icon dan text
+                      const SizedBox(width: 6), 
                       Text(
-                        // Format: DD-MM-YYYY
-                        // padLeft(2, '0') gunanya biar kalau tanggal '5' jadi '05'
+                        // format: DD-MM-YYYY
+                        // padLeft(2, '0') biar kalau tanggal '5' jadi '05'
                         "${event.startDate.day.toString().padLeft(2, '0')}-${event.startDate.month.toString().padLeft(2, '0')}-${event.startDate.year}",
                         style: TextStyle(
                           color: Color.fromARGB(255, 155, 184, 65),
@@ -100,7 +100,7 @@ class EventCard extends StatelessWidget {
                   ),
                   
                   const SizedBox(height: 8),
-                  // Slot Peserta
+                  // info slot Peserta
                   Text(
                     "Slots: ${event.participantCount}/${event.maxParticipants}",
                     style: const TextStyle(

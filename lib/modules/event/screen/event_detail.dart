@@ -40,11 +40,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // foto Lapangan (Ganti dengan image_url dari event)
+                // foto lapangan (Ganti dengan image_url dari event)
                 Image.network(
                   widget.event.imageUrl.isNotEmpty 
                       ? widget.event.imageUrl 
-                      : "https://via.placeholder.com/500x300", // Placeholder jika kosong
+                      : "https://via.placeholder.com/500x300", // placeholder kalo kosong
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: Colors.grey,
@@ -211,7 +211,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   elevation: 0,
                 ),
                 onPressed: () {
-                  // Dummy Logic Toggle
+                  // ini buat toggle button join atau cancel join
                   setState(() {
                     isJoined = !isJoined;
                   });

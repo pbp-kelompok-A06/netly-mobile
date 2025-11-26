@@ -60,11 +60,10 @@ class _EventPageState extends State<EventPage> {
       // Add New Event Button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          //  showDialog -> buat pop up form add event
+          //  showDialog -> buat pop up form add event (jadi ga pindah halaman)
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              // Panggil Form kamu di sini
               return const EventFormPage();
             },
           );
