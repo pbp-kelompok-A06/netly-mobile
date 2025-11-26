@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:netly_mobile/modules/booking/model/jadwal_model.dart';
-import 'package:netly_mobile/modules/booking/model/lapangan_model.dart';
+//dummy 
+import 'package:netly_mobile/modules/booking/model/dummy_jadwal_lapangan_model.dart';
+import 'package:netly_mobile/modules/booking/model/dummy_lapangan_model.dart';
 import 'package:netly_mobile/modules/booking/services/booking_services.dart';
 // dummy 
 import 'booking_detail_screen.dart';
@@ -131,15 +132,15 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                     itemBuilder: (context, index) {
                       final jadwal = jadwalList[index];
                       // Format tanggal untuk tampilan yang lebih ramah
-                      final String formattedDate = DateFormat('EEEE, d MMM').format(DateTime.parse(jadwal.tanggal));
+                      final String formattedDate = DateFormat('EEEE, d MMM').format(jadwal.tanggal);
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 1),
                         color: Colors.white,
                         child: CheckboxListTile(
                           activeColor: const Color(0xFF243153),
-                          title: Text('$formattedDate - ${jadwal.timeRange}'),
-                          subtitle: Text(jadwal.isAvailable ? 'Tersedia' : 'Sudah Dipesan', style: TextStyle(color: jadwal.isAvailable ? Colors.green : Colors.red : Colors.red, fontSize: 12)),
+                          title: Text('$formattedDate - ${jadwal.startMain} to ${jadwal.endMain}', style: const TextStyle(color: Color(0xFF243153), fontWeight: FontWeight.w600)),
+                          subtitle: Text(jadwal.isAvailable ? 'Tersedia' : 'Sudah Dipesan', style: TextStyle(color: jadwal.isAvailable ? Colors.green : Colors.red, fontSize: 12)),
                           value: _selectedJadwalIds.contains(jadwal.id),
                           onChanged: (bool? newValue) {
                             if (jadwal.isAvailable) {

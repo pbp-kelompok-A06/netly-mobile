@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 // dummy data
-import 'package:lib/modules/booking/model/jadwal_model.dart';
-import 'package:lib/modules/lapangan/model/lapangan_model.dart';
+import 'dummy_lapangan_model.dart';
+import 'dummy_jadwal_lapangan_model.dart';
 
 
 
