@@ -61,13 +61,13 @@ class ForumPage extends StatelessWidget {
             ),
           ),
           const Expanded(child: Center(child: Text('Hello, world!'))),
-
+      
           ElevatedButton(
             onPressed: () async {
               
 
               final response = await request.logout(
-                "${pathWeb['netly']}/logout-ajax/"
+                "$pathWeb/logout-ajax/"
               );
               if (response['status'] == 'success'){
                 if (context.mounted){

@@ -222,7 +222,7 @@ class _RegisterPageState extends State<RegisterPage>{
 
 
                                 final response = await request.login(
-                                  "${pathWeb['netly']}/register-ajax/",
+                                  "$pathWeb/register-ajax/",
                                   jsonEncode({
                                     'username': _usernameController.text,
                                     'password1': _passwordController.text,
