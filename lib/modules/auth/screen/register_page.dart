@@ -182,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _confirmPasswordController,
                       obscureText: !_confirmPasswordShown,
                       decoration: InputDecoration(
-                        hintText: "Password",
+                        hintText: "Confirm Password",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
