@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:netly_mobile/modules/booking/model/booking_model.dart';
 import 'package:netly_mobile/modules/booking/model/dummy_jadwal_lapangan_model.dart';
 import 'package:netly_mobile/modules/booking/model/dummy_lapangan_model.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 
 class BookingService {
-  static const String _baseUrl = "http://127.0.0.1:8000";
 
   final CookieRequest request;
 
@@ -15,7 +15,7 @@ class BookingService {
   Future<Map<String, dynamic>> fetchAvailableSchedules(
     String lapanganId,
   ) async {
-    final url = '$_baseUrl/booking/get_booking_data_flutter/$lapanganId/';
+    final url = '$pathWeb/booking/get_booking_data_flutter/$lapanganId/';
 
     final response = await request.get(url);
 
@@ -55,7 +55,7 @@ class BookingService {
   }
 
   Future<List<Booking>> fetchBookings() async {
-    final url = '$_baseUrl/booking/show_json/';
+    final url = '$pathWeb/booking/show_json/';
 
     final response = await request.get(url);
 
@@ -71,11 +71,13 @@ class BookingService {
   }
 
   Future<Booking> fetchBookingDetail(String bookingId) async {
-    final url = '$_baseUrl/booking/show_json_id/$bookingId/';
+    final url = '$pathWeb/booking/show_json_id/$bookingId/';
 
     final response = await request.get(url);
+    print(response);
 
     if (response is Map) {
+      print("masuk map");
       return Booking.fromJson(response as Map<String, dynamic>);
     } else {
       throw Exception(
@@ -88,7 +90,7 @@ class BookingService {
     String lapanganId,
     List<String> jadwalIds,
   ) async {
-    final url = '$_baseUrl/booking/create_booking/';
+    final url = '$pathWeb/booking/create_booking/';
 
     final Map<String, dynamic> body = {
       'lapangan_id': lapanganId,
@@ -115,7 +117,7 @@ class BookingService {
   }
 
   Future<bool> completePayment(String bookingId) async {
-    final url = '$_baseUrl/booking/booking_detail/$bookingId/complete/';
+    final url = '$pathWeb/booking/booking_detail/$bookingId/complete/';
 
     final response = await request.post(url, {});
 

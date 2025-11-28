@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage>{
                                 String password = _passwordController.text;
 
                                 final response = await request.login(
-                                  "${pathWeb['netly']}/login-ajax/",
+                                  "$pathWeb/login-ajax/",
                                   jsonEncode({
                                     'username': username,
                                     'password': password,

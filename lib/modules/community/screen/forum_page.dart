@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
+import 'package:netly_mobile/modules/booking/route/booking_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -61,13 +62,13 @@ class ForumPage extends StatelessWidget {
             ),
           ),
           const Expanded(child: Center(child: Text('Hello, world!'))),
-
+      
           ElevatedButton(
             onPressed: () async {
               
 
               final response = await request.logout(
-                "${pathWeb['netly']}/logout-ajax/"
+                "$pathWeb/logout-ajax/"
               );
               if (response['status'] == 'success'){
                 if (context.mounted){
@@ -80,8 +81,27 @@ class ForumPage extends StatelessWidget {
               }
 
             },
+            
 
             child: Text("Logout"),
+          ),
+                    ElevatedButton(
+            onPressed: () async {
+              
+
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: BookingRoutes.routes[BookingRoutes.tes2]!)
+                  );
+                
+
+              
+
+            },
+            
+
+            child: Text("Booking"),
           ),
         ],
       ),

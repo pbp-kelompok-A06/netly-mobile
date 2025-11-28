@@ -28,9 +28,9 @@ class MyApp extends StatelessWidget {
           
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        // initialRoute: AuthRoutes.login,
-        // routes: AppRoutes.routes,
-        home : CreateBookingScreen(lapanganId: '9dbed1f9-8953-4cd0-8268-dce2653fdd93'),
+        initialRoute: AuthRoutes.login,
+        routes: AppRoutes.routes,
+        // home : CreateBookingScreen(lapanganId: '9dbed1f9-8953-4cd0-8268-dce2653fdd93'),
       ),
       
     );
