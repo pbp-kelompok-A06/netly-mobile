@@ -62,46 +62,47 @@ class ForumPage extends StatelessWidget {
             ),
           ),
           const Expanded(child: Center(child: Text('Hello, world!'))),
-      
+
           ElevatedButton(
             onPressed: () async {
-              
-
-              final response = await request.logout(
-                "$pathWeb/logout-ajax/"
-              );
-              if (response['status'] == 'success'){
-                if (context.mounted){
+              final response = await request.logout("$pathWeb/logout-ajax/");
+              if (response['status'] == 'success') {
+                if (context.mounted) {
                   Navigator.pushReplacement(
-                    context, 
-                    MaterialPageRoute(builder: AuthRoutes.routes[AuthRoutes.login]!)
+                    context,
+                    MaterialPageRoute(
+                      builder: AuthRoutes.routes[AuthRoutes.login]!,
+                    ),
                   );
                 }
-
               }
-
             },
-            
 
             child: Text("Logout"),
           ),
-                    ElevatedButton(
+          ElevatedButton(
             onPressed: () async {
-              
-
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: BookingRoutes.routes[BookingRoutes.tes2]!)
-                  );
-                
-
-              
-
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: BookingRoutes.routes[BookingRoutes.tes2]!,
+                ),
+              );
             },
-            
 
             child: Text("Booking"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: BookingRoutes.routes[BookingRoutes.tes3]!,
+                ),
+              );
+            },
+
+            child: Text("Booking List"),
           ),
         ],
       ),
