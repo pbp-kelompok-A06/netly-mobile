@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:netly_mobile/app_route.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:netly_mobile/modules/homepage/route/homepage_route.dart';
 
 import 'package:provider/provider.dart';
 
@@ -24,13 +25,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Netly',
         theme: ThemeData(
-          
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF243153)),
+          useMaterial3: true,
         ),
         initialRoute: AuthRoutes.login,
         routes: AppRoutes.routes,
       ),
-      
     );
   }
 }

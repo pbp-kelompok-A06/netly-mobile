@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/homepage/route/homepage_route.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -25,9 +26,8 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: 
-      Padding(
-        padding: const EdgeInsets.all( 24.0),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,10 +36,7 @@ class _LoginPageState extends State<LoginPage> {
               // GREETINGS MESSAGE
               const Text(
                 "Welcome!",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 8),
@@ -87,7 +84,9 @@ class _LoginPageState extends State<LoginPage> {
                         // ICON SHOW / HIDE PASSWORD
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _passwordShown? Icons.visibility: Icons.visibility_off,
+                            _passwordShown
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -104,7 +103,6 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
 
-
                     const SizedBox(height: 16),
 
                     SizedBox(
@@ -112,9 +110,9 @@ class _LoginPageState extends State<LoginPage> {
                       height: 48,
                       child: ElevatedButton(
                         onPressed: () async {
-                          if (!_formKey.currentState!.validate()){
-                            return ;
-                          } 
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
 
                           String username = _usernameController.text;
                           String password = _passwordController.text;
@@ -133,8 +131,8 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: CommunityRoutes
-                                      .routes[CommunityRoutes.tes]!,
+                                  builder: HomepageRoutes
+                                      .routes[HomepageRoutes.home]!,
                                 ),
                               );
                             }
@@ -148,9 +146,8 @@ class _LoginPageState extends State<LoginPage> {
                                   actions: [
                                     TextButton(
                                       child: const Text('OK'),
-                                      onPressed: () =>
-                                          Navigator.pop(context),
-                                    )
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
                                   ],
                                 ),
                               );
@@ -165,10 +162,6 @@ class _LoginPageState extends State<LoginPage> {
                         child: const Text("Login"),
                       ),
                     ),
-
-                  
-
-                    
 
                     const SizedBox(height: 50),
 
@@ -192,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.blue,
                                 fontWeight: FontWeight.bold,
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -205,7 +198,6 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
-        
       ),
     );
   }

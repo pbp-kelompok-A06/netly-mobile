@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/homepage/route/homepage_route.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -245,7 +246,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               if (context.mounted){
                                 Navigator.pushReplacement(
                                   context, 
-                                  MaterialPageRoute(builder: CommunityRoutes.routes[CommunityRoutes.tes]!)
+                                  MaterialPageRoute(builder: HomepageRoutes.routes[HomepageRoutes.home]!)
                                 );
                               }
 
