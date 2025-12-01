@@ -83,7 +83,7 @@ class _EventFormPageState extends State<EventFormPage> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Event Name",
-                    labelStyle: const TextStyle(fontSize: 14),
+                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
@@ -99,7 +99,7 @@ class _EventFormPageState extends State<EventFormPage> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Location",
-                    labelStyle: const TextStyle(fontSize: 14),
+                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
@@ -120,7 +120,7 @@ class _EventFormPageState extends State<EventFormPage> {
                         readOnly: true, // readonly, ga bisa ketik atau muncul keyboard
                         decoration: InputDecoration(
                           labelText: "Start Date",
-                          labelStyle: const TextStyle(fontSize: 14),
+                          labelStyle: const TextStyle(fontSize: 12),
                           prefixIcon: const Icon(Icons.calendar_today),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -137,7 +137,7 @@ class _EventFormPageState extends State<EventFormPage> {
                         readOnly: true, 
                         decoration: InputDecoration(
                           labelText: "End Date",
-                          labelStyle: const TextStyle(fontSize: 14),
+                          labelStyle: const TextStyle(fontSize: 12),
                           prefixIcon: const Icon(Icons.calendar_today),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -154,7 +154,7 @@ class _EventFormPageState extends State<EventFormPage> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Max Participants",
-                    labelStyle: const TextStyle(fontSize: 14),
+                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
@@ -172,7 +172,7 @@ class _EventFormPageState extends State<EventFormPage> {
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: "Image URL",
-                    labelStyle: const TextStyle(fontSize: 14),
+                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
@@ -185,7 +185,7 @@ class _EventFormPageState extends State<EventFormPage> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     labelText: "Description",
-                    labelStyle: const TextStyle(fontSize: 14),
+                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),

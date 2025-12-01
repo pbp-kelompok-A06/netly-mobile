@@ -168,14 +168,14 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     "Deskripsi",
                     style: TextStyle(
                       color: _primaryBlue,
-                      fontSize: 13,
+                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     widget.event.description,
-                    style: TextStyle(color: _primaryBlue, height: 1.5, fontSize: 12),
+                    style: TextStyle(color: _primaryBlue, height: 1.5, fontSize: 11),
                   ),
                 ],
               ),
