@@ -116,7 +116,6 @@ class _LoginPageState extends State<LoginPage>{
                                 if (request.loggedIn){
 
                                   request.jsonData['userData'] = response['data'];
-
                                   // if (context.mounted){
                                   //   Navigator.pushReplacement(
                                   //     context, 
