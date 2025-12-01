@@ -5,8 +5,10 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/booking/screen/create_booking_screen.dart';
 
 import 'package:provider/provider.dart';
-
-void main() {
+import 'package:intl/date_symbol_data_local.dart';
+  
+void main() async {
+  await initializeDateFormatting();
   runApp(const MyApp());
 }
 

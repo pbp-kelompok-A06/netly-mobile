@@ -124,7 +124,7 @@ class Booking {
     CookieRequest request,
   ) async {
     print(  "Fetching Jadwal ID: $id");
-    final url = "$pathWeb/lapangan/jadwal/ajax/get/$id/";
+    final url = "$pathWeb/booking/get_jadwal_detail_json/$id/";
     final response = await request.get(url);
     print("JADWAL DETAIL:");
     print(response);

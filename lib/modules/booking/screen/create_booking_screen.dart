@@ -10,6 +10,7 @@ import 'package:netly_mobile/modules/booking/services/booking_services.dart';
 import 'booking_detail_screen.dart';
 
 class CreateBookingScreen extends StatefulWidget {
+  
   final String lapanganId;
 
   // Constructor bisa menerima Lapangan object dari Home Page untuk info
@@ -50,6 +51,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     }
 
     try {
+      print("_selectedJadwalIds.toList(): ${_selectedJadwalIds.toList()}");
       final Map<String, dynamic> result = await _service.createBooking(
         widget.lapanganId, 
         _selectedJadwalIds.toList(),
@@ -68,6 +70,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       );
       
     } catch (e) {
+      print("Error saat submit booking: $e");
       _showSnackBar(e.toString(), isError: true);
     }
   }
@@ -77,8 +80,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     // Memastikan DateFormat dapat mengenali 'EEEE, d MMM' untuk bahasa Indonesia
     // Karena kita menggunakan locale 'id_ID' di NumberFormat, pastikan locale tersedia.
     Intl.defaultLocale = 'id_ID';
-
+print("Building CreateBookingScreen for Lapangan ID: ${widget.lapanganId}");
     return Scaffold(
+      
       appBar: AppBar(
         title: const Text('Pilih Jadwal Booking'),
         backgroundColor: const Color(0xFF243153),
@@ -92,6 +96,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
           } 
           
           if (snapshot.hasError) {
+            print("Error  ${snapshot}");
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           

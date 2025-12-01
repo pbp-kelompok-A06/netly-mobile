@@ -108,17 +108,19 @@ class BookingService {
     String lapanganId,
     List<String> jadwalIds,
   ) async {
-    final url = '$pathWeb/booking/create_booking/';
-
+    print(  "Creating booking for Lapangan ID: $lapanganId with Jadwal IDs: $jadwalIds");
+    final url = '$pathWeb/booking/create_booking_flutter/';
+    
     final Map<String, dynamic> body = {
       'lapangan_id': lapanganId,
 
       'jadwal_id': jadwalIds,
     };
 
-    final response = await request.post(url, body);
-
+    final response = await request.postJson(url, jsonEncode(body));
+    print("response from createBooking: $response");
     if (response is Map) {
+      
       final Map<String, dynamic> data = response as Map<String, dynamic>;
       if (data['success'] == true) {
         return {
