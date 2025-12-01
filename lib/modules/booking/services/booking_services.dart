@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:netly_mobile/modules/booking/model/booking_model.dart';
-import 'package:netly_mobile/modules/booking/model/dummy_jadwal_lapangan_model.dart';
-import 'package:netly_mobile/modules/booking/model/dummy_lapangan_model.dart';
+import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart'
+    as Lapangan;
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart'
+    as Jadwal;
 import 'package:netly_mobile/utils/path_web.dart';
 
 class BookingService {
-
   final CookieRequest request;
 
   BookingService({required this.request});
@@ -22,13 +23,14 @@ class BookingService {
     if (response is List) {
       final jsonResponse = response.first;
 
-      final Lapangan lapangan = Lapangan.fromJson(
+      final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(
         jsonResponse['lapangan'] as Map<String, dynamic>,
       );
 
-      final List<Jadwal> jadwalList = (jsonResponse['jadwal_list'] as List)
-          .map((j) => Jadwal.fromJson(j as Map<String, dynamic>))
-          .toList();
+      final List<Jadwal.Datum> jadwalList =
+          (jsonResponse['jadwal_list'] as List)
+              .map((j) => Jadwal.Datum.fromJson(j as Map<String, dynamic>))
+              .toList();
 
       return {'lapangan': lapangan, 'jadwalList': jadwalList};
     } else if (response is Map) {
@@ -36,12 +38,13 @@ class BookingService {
           response as Map<String, dynamic>;
 
       if (jsonResponse.containsKey('lapangan')) {
-        final Lapangan lapangan = Lapangan.fromJson(
+        final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(
           jsonResponse['lapangan'] as Map<String, dynamic>,
         );
-        final List<Jadwal> jadwalList = (jsonResponse['jadwal_list'] as List)
-            .map((j) => Jadwal.fromJson(j as Map<String, dynamic>))
-            .toList();
+        final List<Jadwal.Datum> jadwalList =
+            (jsonResponse['jadwal_list'] as List)
+                .map((j) => Jadwal.Datum.fromJson(j as Map<String, dynamic>))
+                .toList();
 
         return {'lapangan': lapangan, 'jadwalList': jadwalList};
       }
@@ -54,36 +57,51 @@ class BookingService {
     }
   }
 
-  Future<List<Booking>> fetchBookings() async {
-    final url = '$pathWeb/booking/show_json/';
+  Future<List<Booking>> fetchAllBookings(CookieRequest request) async {
+    // Ganti dengan endpoint API Django Anda untuk mendapatkan list booking mentah
 
-    final response = await request.get(url);
+    try {
+      final response = await request.get('$pathWeb/booking/show_json/');
 
-    if (response is List) {
-      return response
-          .map((b) => Booking.fromJson(b as Map<String, dynamic>))
-          .toList();
-    } else {
-      throw Exception(
-        'Gagal memuat daftar booking. Pastikan Anda sudah login.',
-      );
+        final List rawData = response as List;
+
+
+        // Proses setiap item secara paralel (concurrent)
+        final List<Future<Booking>> futures = rawData.map((jsonItem) {
+          // PENTING: Meneruskan objek 'request' ke fromRawJson
+          return Booking.fromRawJson(jsonItem as Map<String, dynamic>, request);
+        }).toList();
+
+        // Tunggu semua proses fetching detail selesai
+        final List<Booking> completedBookings = await Future.wait(futures);
+
+        return completedBookings;
+      
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error di fetchAllBookings: $e');
+      }
+      rethrow;
     }
   }
 
-  Future<Booking> fetchBookingDetail(String bookingId) async {
+  Future<Booking> fetchBookingDetail(
+    String bookingId,
+    CookieRequest request,
+  ) async {
     final url = '$pathWeb/booking/show_json_id/$bookingId/';
 
     final response = await request.get(url);
-    print(response);
 
-    if (response is Map) {
-      print("masuk map");
-      return Booking.fromJson(response as Map<String, dynamic>);
-    } else {
-      throw Exception(
-        'Gagal memuat detail booking. Pastikan ID valid dan Anda sudah login.',
-      );
-    }
+    
+      final Map<String, dynamic> jsonData =
+          response as Map<String, dynamic>;
+
+      // PENTING: Meneruskan objek 'request' ke fromRawJson
+      final Booking booking = await Booking.fromRawJson(jsonData, request);
+
+      return booking;
+
   }
 
   Future<Map<String, dynamic>> createBooking(

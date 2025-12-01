@@ -4,7 +4,7 @@
   import 'package:provider/provider.dart';
   import 'package:netly_mobile/modules/booking/model/booking_model.dart';
   import 'package:netly_mobile/modules/booking/services/booking_services.dart';
-  import 'package:netly_mobile/modules/booking/model/dummy_jadwal_lapangan_model.dart';
+  import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart' as Jadwal;
 
   class BookingDetailScreen extends StatefulWidget {
     final bookingId;
@@ -31,7 +31,7 @@
     void _fetchBookingDetail() {
       print('Fetching booking detail for ID: ${widget.bookingId}');
       setState(() {
-        _futureBooking = _service.fetchBookingDetail(widget.bookingId);
+        _futureBooking = _service.fetchBookingDetail(widget.bookingId, _service.request);
       });
     }
 
@@ -245,7 +245,7 @@
       );
     }
 
-    Widget _buildScheduleItem(Jadwal jadwal) {
+    Widget _buildScheduleItem(Jadwal.Datum jadwal) {
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),

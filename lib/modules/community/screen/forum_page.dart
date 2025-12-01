@@ -104,6 +104,19 @@ class ForumPage extends StatelessWidget {
 
             child: Text("Booking List"),
           ),
+                    ElevatedButton(
+            onPressed: () async {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: BookingRoutes.routes[BookingRoutes.tes3]!,
+                ),
+              );
+            },
+
+            child: Text("Booking create"),
+          ),
+          
         ],
       ),
     );

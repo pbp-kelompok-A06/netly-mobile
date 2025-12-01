@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
 // Asumsi: File ini sekarang mengekspor class 'Booking' alih-alih 'BookingModel'
@@ -38,9 +38,10 @@ class _BookingListPageState extends State<BookingListPage> {
 
     try {
       // Menggunakan fetchBookings dari Service yang mengembalikan List<Booking>
-      return await service.fetchBookings();
+      return await service.fetchAllBookings(request);
     } catch (e) {
       print('Failed to load bookings via Service: $e');
+
       if (context.mounted) {
         // Pesan error diambil dari Exception yang dilempar oleh service
         _showErrorDialog(

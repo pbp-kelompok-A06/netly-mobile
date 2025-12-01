@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-//dummy 
-import 'package:netly_mobile/modules/booking/model/dummy_jadwal_lapangan_model.dart';
-import 'package:netly_mobile/modules/booking/model/dummy_lapangan_model.dart';
+
+import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart' as Lapangan; // Import package untuk otentikasi
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart' as Jadwal; // Import variabel pathWeb Anda
 import 'package:netly_mobile/modules/booking/services/booking_services.dart';
 // dummy 
 import 'booking_detail_screen.dart';
@@ -96,8 +96,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
           }
           
           if (snapshot.hasData) {
-            final Lapangan lapangan = snapshot.data!['lapangan'];
-            final List<Jadwal> jadwalList = snapshot.data!['jadwalList'];
+            final Lapangan.Datum lapangan = snapshot.data!['lapangan'];
+            final List<Jadwal.Datum> jadwalList = snapshot.data!['jadwalList'];
             
             if (jadwalList.isEmpty) {
                return const Center(child: Text('Tidak ada jadwal tersedia dalam 3 hari ke depan.'));
@@ -131,7 +131,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                     itemCount: jadwalList.length,
                     itemBuilder: (context, index) {
                       final jadwal = jadwalList[index];
-                      // Format tanggal untuk tampilan yang lebih ramah
+                      
                       final String formattedDate = DateFormat('EEEE, d MMM').format(jadwal.tanggal);
 
                       return Container(
@@ -170,8 +170,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     );
   }
   
-  Widget _buildFooter(Lapangan lapangan) {
-    final double subtotal = _selectedJadwalIds.length * lapangan.price;
+  Widget _buildFooter(Lapangan.Datum lapangan) {
+    final int subtotal = _selectedJadwalIds.length * lapangan.price;
     final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
     return Container(

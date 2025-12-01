@@ -1,13 +1,20 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:netly_mobile/utils/path_web.dart';
+import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart'
+    as Lapangan; // Import package untuk otentikasi
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart'
+    as Jadwal; // Import variabel pathWeb Anda
 
-import 'dummy_lapangan_model.dart';
-import 'dummy_jadwal_lapangan_model.dart';
+// Menggunakan Import Aliasing untuk mengatasi konflik nama kelas 'Datum'
 
 // Model Utama untuk data Booking
 class Booking {
   final String id;
-  final Lapangan lapangan;
+  // Menggunakan Lapangan.Datum untuk detail lapangan
+  final Lapangan.Datum lapangan;
 
   // User fields
   final String userId;
@@ -17,9 +24,11 @@ class Booking {
   final double totalPrice;
   final DateTime createdAt;
 
-  final List<Jadwal> jadwal;
+  // Menggunakan List Jadwal.Datum untuk detail jadwal
+  final List<Jadwal.Datum> jadwal;
 
-  Booking({
+  // Constructor privat, dipanggil hanya setelah fetching detail selesai
+  Booking._({
     required this.id,
     required this.lapangan,
     required this.userId,
@@ -30,42 +39,102 @@ class Booking {
     required this.jadwal,
   });
 
-  factory Booking.fromJson(Map<String, dynamic> json) {
-    // Parsing Lapangan
-    final lapanganJson = json['lapangan'] as Map<String, dynamic>;
-    // di sini menggunakan field yang sesuai dari JSON untuk menggunakan objek lapangan yang ada di data base
-    final lapangan = Lapangan.fromJson({
-      'id': lapanganJson['id'],
-      'name': lapanganJson['name'],
-      'price': lapanganJson['price'],
-    });
+  // --- Static Asynchronous Constructor ---
 
-    // Parsing User
+  // Metode untuk membuat objek Booking LENGKAP dari raw JSON yang hanya berisi ID.
+  static Future<Booking> fromRawJson(
+    Map<String, dynamic> json,
+    CookieRequest request,
+  ) async {
+    // 1. Ekstraksi ID Lapangan dan ID Jadwal dari JSON booking awal
+
+
+    final lapanganJson = json['lapangan'] as Map<String, dynamic>;
+    final String lapanganId = lapanganJson['id'].toString();
+
     final userJson = json['user'] as Map<String, dynamic>;
     final userId = userJson['id'].toString();
     final userFullname = userJson['fullname'] ?? '';
 
-    // Parsing Jadwal
-    final jadwalList = (json['jadwal'] as List<dynamic>).map((j) {
-      return Jadwal.fromJson({
-        'id': "${j['tanggal']}_${j['start_main']}",  // fallback id
-        'tanggal': j['tanggal'],
-        'start_main': j['start_main'],
-        'end_main': j['end_main'],
-        'is_available': j['is_available'] ?? false,
-      });
-    }).toList();
+    // Ambil List of ID Jadwal
+    final List<String> jadwalIdsList = (json['jadwal'] as List<dynamic>)
+        .map((j) => j['id']?.toString() ?? "${j['tanggal']}_${j['start_main']}")
+        .toList();
 
-    return Booking(
-      id: json['id'].toString(),
-      lapangan: lapangan,
-      userId: userId,
-      userFullname: userFullname,
-      statusBook: json['status_book'],
-      
-      totalPrice: double.parse(json['total_price'].toString()),
-      createdAt: DateTime.parse(json['created_at']),
-      jadwal: jadwalList,
+    // 2. Fetch Detail Lapangan dan Jadwal secara paralel (Concurrent fetching)
+
+    // Meneruskan request cookie untuk otentikasi
+    final futureLapangan = _fetchLapanganDetail(lapanganId, request);
+    final futureJadwal = Future.wait(
+      jadwalIdsList.map((id) => _fetchJadwalDetail(id, request)).toList(),
     );
+
+    try {
+          print("RAW BOOKING JSON:");
+    print(json);
+      // Tunggu hasil dari fetching detail
+      final Lapangan.Datum detailLapangan = await futureLapangan;
+      final List<Jadwal.Datum> detailsJadwal = await futureJadwal;
+
+      // 3. Kembalikan objek Booking lengkap
+      return Booking._(
+        id: json['id'].toString(),
+        lapangan: detailLapangan,
+        userId: userId,
+        userFullname: userFullname,
+        statusBook: json['status_book'],
+        totalPrice: double.parse(json['total_price'].toString()),
+        createdAt: DateTime.parse(json['created_at']),
+        jadwal: detailsJadwal,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching booking details: $e');
+      }
+      rethrow;
+    }
+  }
+
+  // --- Helper Functions untuk Fetching Detail ---
+
+  // Fetches detail Lapangan menggunakan CookieRequest
+  static Future<Lapangan.Datum> _fetchLapanganDetail(
+    String id,
+    CookieRequest request,
+  ) async {
+    // Menggunakan pathWeb['netly']
+    final url = "$pathWeb/lapangan/api/lapangan/$id/";
+    final response = await request.get(url);
+
+    print("LAPANGAN DETAIL:");
+    print(response['data']);
+
+    if (response['status'] == 'success') {
+      return Lapangan.Datum.fromJson(response['data']);
+    } else {
+      throw Exception(
+        'Gagal memuat detail Lapangan ID: $id. Pesan: ${response['message']}',
+      );
+    }
+  }
+
+  // Fetches detail Jadwal menggunakan CookieRequest
+  static Future<Jadwal.Datum> _fetchJadwalDetail(
+    String id,
+    CookieRequest request,
+  ) async {
+    print(  "Fetching Jadwal ID: $id");
+    final url = "$pathWeb/lapangan/jadwal/ajax/get/$id/";
+    final response = await request.get(url);
+    print("JADWAL DETAIL:");
+    print(response);
+
+    if (response['status'] == 'success') {
+      return Jadwal.Datum.fromJson(response['data']);
+    } else {
+      throw Exception(
+        'Gagal memuat detail Jadwal ID: $id. Pesan: ${response['message']}',
+      );
+    }
   }
 }
