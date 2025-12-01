@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// 👇 1. Import Halaman Favorit
+import 'package:netly_mobile/modules/homepage/screen/favorite_page.dart';
 
 class CustomBottomNav extends StatelessWidget {
   const CustomBottomNav({super.key});
@@ -6,16 +8,16 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      shape: const CircularNotchedRectangle(), // Ini yang bikin lengkungan (Coak)
-      notchMargin: 8.0, // Jarak antara tombol Home dengan lengkungan putih
+      shape: const CircularNotchedRectangle(), // Lengkungan (Coak)
+      notchMargin: 8.0, 
       color: Colors.white,
       surfaceTintColor: Colors.white,
       shadowColor: Colors.black,
       elevation: 10,
-      height: 70, // Tinggi bar
+      height: 70, 
       padding: EdgeInsets.zero,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround, // Biar jaraknya rata
+        mainAxisAlignment: MainAxisAlignment.spaceAround, 
         children: [
           // === KIRI (2 MENU) ===
           
@@ -28,7 +30,9 @@ class CustomBottomNav extends StatelessWidget {
                 Text("Booking", style: TextStyle(fontSize: 10, color: Colors.grey))
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Navigasi ke modul Booking (Budi)
+            },
           ),
 
           // 2. Community
@@ -40,7 +44,9 @@ class CustomBottomNav extends StatelessWidget {
                 Text("Community", style: TextStyle(fontSize: 10, color: Colors.grey))
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Navigasi ke modul Community
+            },
           ),
 
           // === SPACER TENGAH (Jarak buat tombol Home) ===
@@ -57,7 +63,9 @@ class CustomBottomNav extends StatelessWidget {
                 Text("Events", style: TextStyle(fontSize: 10, color: Colors.grey))
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+               // TODO: Navigasi ke modul Events
+            },
           ),
 
           // 4. Favorites
@@ -69,7 +77,13 @@ class CustomBottomNav extends StatelessWidget {
                 Text("Favorites", style: TextStyle(fontSize: 10, color: Colors.grey))
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+              // 👇 2. LOGIC NAVIGASI KE FAVORITE PAGE
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FavoritePage()),
+              );
+            },
           ),
         ],
       ),

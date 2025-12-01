@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/homepage/model/home_model.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:netly_mobile/modules/homepage/screen/court_detail_page.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // ✅ Import Package Baru
 
 class CourtCard extends StatelessWidget {
   final Court court;
@@ -10,7 +9,6 @@ class CourtCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Logic URL Gambar
     String imageUrl = court.image;
     if (!imageUrl.startsWith('http')) {
       if (imageUrl.startsWith('/')) {
@@ -47,42 +45,48 @@ class CourtCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === GAMBAR PAKAI CACHED NETWORK IMAGE ===
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 child: SizedBox(
                   height: 135,
                   width: double.infinity,
-                  // 👇 GANTI BAGIAN INI
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
+                  child: Image.network(
+                    imageUrl,
                     fit: BoxFit.cover,
-                    // Tampilan saat loading
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    // Tampilan jika error (misal CORS)
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[100],
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image_outlined, color: Colors.grey, size: 32),
-                            SizedBox(height: 4),
-                            Text("Failed to load", style: TextStyle(color: Colors.grey, fontSize: 10)),
-                          ],
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                      ),
-                    ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.blue.shade400,
+                              Colors.blue.shade600,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.sports_tennis,
+                            size: 48,
+                            color: Colors.white54,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
               
-              // === TEKS INFO (TETAP SAMA) ===
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -120,6 +124,8 @@ class CourtCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                      
+                      // Harga
                       Text(
                         "Rp ${court.formattedPrice}",
                         style: const TextStyle(
