@@ -6,6 +6,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
 import 'package:netly_mobile/modules/community/route/community_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
+import 'package:netly_mobile/main_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -243,12 +244,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             if (request.loggedIn){
                               request.jsonData['userData'] = response['data'];
 
-                              if (context.mounted){
-                                Navigator.pushReplacement(
-                                  context, 
-                                  MaterialPageRoute(builder: HomepageRoutes.routes[HomepageRoutes.home]!)
-                                );
-                              }
+                            if (context.mounted) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainPage(), 
+                                ),
+                              );
+                            }
 
                             }else{
                               if (context.mounted){

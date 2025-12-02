@@ -117,6 +117,7 @@ class _FavoritePageState extends State<FavoritePage> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
         iconTheme: const IconThemeData(color: Color(0xFF243153)),
       ),
       body: Column(
@@ -133,7 +134,7 @@ class _FavoritePageState extends State<FavoritePage> {
                   _buildFilterChip('', 'All'),
                   _buildFilterChip('Rumah', '🏠 Near Home'),
                   _buildFilterChip('Kantor', '🏢 Near Office'),
-                  _buildFilterChip('Lainnya', '📍 Others'),
+                  _buildFilterChip('Others', '📍 Others'),
                 ],
               ),
             ),

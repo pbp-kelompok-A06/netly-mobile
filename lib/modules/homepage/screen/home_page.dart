@@ -145,29 +145,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
 
-      // --- TOMBOL TENGAH (HOME) ---
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .centerDocked, // Posisi di tengah menjorok ke dalam
-      floatingActionButton: SizedBox(
-        width: 65, // Ukuran tombol home agak besar biar gagah
-        height: 65,
-        child: FloatingActionButton(
-          onPressed: () {
-            // Aksi refresh / balik ke atas
-          },
-          backgroundColor: const Color(0xFF243153), // Warna Navy (Utama)
-          shape: const CircleBorder(), // Bulat sempurna
-          elevation: 4,
-          child: const Icon(
-            Icons.home_rounded,
-            color: Color(0xFFD7FC64),
-            size: 35,
-          ), // Ikon Rumah warna Lime
-        ),
-      ),
 
-      // --- NAVBAR BAWAH (LENGKUNG) ---
-      bottomNavigationBar: const CustomBottomNav(),
     );
   }
 }

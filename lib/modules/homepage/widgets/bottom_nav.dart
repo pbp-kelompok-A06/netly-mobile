@@ -1,90 +1,65 @@
 import 'package:flutter/material.dart';
-// 👇 1. Import Halaman Favorit
-import 'package:netly_mobile/modules/homepage/screen/favorite_page.dart';
 
 class CustomBottomNav extends StatelessWidget {
-  const CustomBottomNav({super.key});
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+
+  const CustomBottomNav({
+    super.key,
+    required this.selectedIndex,
+    required this.onItemTapped,
+  });
+
+  // Helper biar kodingan rapi
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    bool isActive = selectedIndex == index;
+    return IconButton(
+      icon: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon, 
+            color: isActive ? const Color(0xFF243153) : Colors.grey, // Warna berubah kalau aktif
+            size: 24
+          ),
+          Text(
+            label, 
+            style: TextStyle(
+              fontSize: 10, 
+              color: isActive ? const Color(0xFF243153) : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            )
+          )
+        ],
+      ),
+      onPressed: () => onItemTapped(index),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      shape: const CircularNotchedRectangle(), // Lengkungan (Coak)
-      notchMargin: 8.0, 
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 8.0,
       color: Colors.white,
       surfaceTintColor: Colors.white,
       shadowColor: Colors.black,
       elevation: 10,
-      height: 70, 
+      height: 70,
       padding: EdgeInsets.zero,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround, 
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // === KIRI (2 MENU) ===
-          
-          // 1. My Booking
-          IconButton(
-            icon: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.calendar_month_outlined, color: Colors.grey, size: 24),
-                Text("Booking", style: TextStyle(fontSize: 10, color: Colors.grey))
-              ],
-            ),
-            onPressed: () {
-              // TODO: Navigasi ke modul Booking (Budi)
-            },
-          ),
+          // Kiri
+          _buildNavItem(Icons.calendar_month_outlined, "Booking", 0),
+          _buildNavItem(Icons.groups_outlined, "Community", 1),
 
-          // 2. Community
-          IconButton(
-            icon: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.groups_outlined, color: Colors.grey, size: 24),
-                Text("Community", style: TextStyle(fontSize: 10, color: Colors.grey))
-              ],
-            ),
-            onPressed: () {
-              // TODO: Navigasi ke modul Community
-            },
-          ),
+          // Spacer Tengah
+          const SizedBox(width: 40),
 
-          // === SPACER TENGAH (Jarak buat tombol Home) ===
-          const SizedBox(width: 40), 
-
-          // === KANAN (2 MENU) ===
-
-          // 3. Event & Tournament
-          IconButton(
-            icon: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.emoji_events_outlined, color: Colors.grey, size: 24),
-                Text("Events", style: TextStyle(fontSize: 10, color: Colors.grey))
-              ],
-            ),
-            onPressed: () {
-               // TODO: Navigasi ke modul Events
-            },
-          ),
-
-          // 4. Favorites
-          IconButton(
-            icon: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.favorite_border, color: Colors.grey, size: 24),
-                Text("Favorites", style: TextStyle(fontSize: 10, color: Colors.grey))
-              ],
-            ),
-            onPressed: () {
-              // 👇 2. LOGIC NAVIGASI KE FAVORITE PAGE
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FavoritePage()),
-              );
-            },
-          ),
+          // Kanan
+          _buildNavItem(Icons.emoji_events_outlined, "Events", 3),
+          _buildNavItem(Icons.favorite_border, "Favorites", 4), // Index 4 sesuai MainPage
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/homepage/route/homepage_route.dart';
 
 import 'package:provider/provider.dart';
+import 'package:netly_mobile/main_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,7 +30,10 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         initialRoute: AuthRoutes.login,
-        routes: AppRoutes.routes,
+        routes: {
+          ...AppRoutes.routes,
+          '/main': (context) => const MainPage(),
+        },
       ),
     );
   }

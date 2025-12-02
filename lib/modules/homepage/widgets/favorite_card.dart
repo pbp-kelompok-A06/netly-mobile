@@ -18,7 +18,7 @@ class FavoriteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final court = favoriteItem.lapangan;
     
-    // === Logic Warna Badge ===
+    // === Logic Badge Label (TETAP SAMA) ===
     Color badgeBgColor;
     Color badgeTextColor;
     String labelText;
@@ -26,26 +26,29 @@ class FavoriteCard extends StatelessWidget {
     if (favoriteItem.label == 'Rumah') {
       badgeBgColor = Colors.blue.shade50;
       badgeTextColor = const Color(0xFF243153);
-      labelText = "🏠 Home";
+      labelText = "🏠 Near Home";
     } else if (favoriteItem.label == 'Kantor') {
       badgeBgColor = Colors.purple.shade50;
       badgeTextColor = Colors.purple.shade800;
-      labelText = "🏢 Office";
+      labelText = "🏢 Near Office";
     } else {
       badgeBgColor = Colors.grey.shade100;
       badgeTextColor = Colors.grey.shade600;
       labelText = "📍 Other";
     }
 
-    // === Logic URL Gambar ===
-    String imageUrl = court.image;
-    if (!imageUrl.startsWith('http')) {
-      if (imageUrl.startsWith('/')) imageUrl = imageUrl.substring(1);
-      imageUrl = "$pathWeb/$imageUrl";
+    // === 👇 LOGIC PROXY IMAGE (YANG DIUBAH) ===
+    String rawUrl = court.image;
+    // 1. Pastikan URL absolut dulu
+    if (!rawUrl.startsWith('http')) {
+      if (rawUrl.startsWith('/')) rawUrl = rawUrl.substring(1);
+      rawUrl = "$pathWeb/$rawUrl";
     }
+    
+    // 2. Bungkus dengan Proxy Django agar lolos CORS di Chrome
+    String proxyUrl = "$pathWeb/proxy-image/?url=${Uri.encodeComponent(rawUrl)}";
 
     return Container(
-      // ✅ Desain Container sama persis dengan home_widget
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -73,16 +76,16 @@ class FavoriteCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === HEADER: GAMBAR & TOMBOL DELETE (STACK) ===
+              // === HEADER: GAMBAR & TOMBOL DELETE ===
               Stack(
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                     child: SizedBox(
-                      height: 135, // Tinggi disamakan dengan home_widget
+                      height: 135,
                       width: double.infinity,
                       child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                        imageUrl: proxyUrl, // 👈 PAKAI URL PROXY DI SINI
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           color: Colors.grey[200],
@@ -104,7 +107,7 @@ class FavoriteCard extends StatelessWidget {
                     ),
                   ),
                   
-                  // Tombol Hapus (Pojok Kanan Atas)
+                  // Tombol Hapus
                   Positioned(
                     top: 8,
                     right: 8,
@@ -126,15 +129,14 @@ class FavoriteCard extends StatelessWidget {
                 ],
               ),
 
-              // === INFO TEXT ===
+              // === CONTENT INFO (TETAP SAMA) ===
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0), // Padding disamakan
+                  padding: const EdgeInsets.all(10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Bagian Atas: Nama & Lokasi
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -149,6 +151,7 @@ class FavoriteCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
+                          
                           Row(
                             children: [
                               const Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
@@ -166,12 +169,9 @@ class FavoriteCard extends StatelessWidget {
                         ],
                       ),
                       
-                      // Bagian Bawah: Harga & Badge Label (Pakai Row biar sejajar)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end, // Biar text align bawah
                         children: [
-                          // Harga
                           Text(
                             "Rp ${court.formattedPrice}",
                             style: const TextStyle(
@@ -180,14 +180,12 @@ class FavoriteCard extends StatelessWidget {
                               color: Color(0xFF243153),
                             ),
                           ),
-                          
-                          // Badge Label
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(
                               color: badgeBgColor,
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: badgeTextColor.withOpacity(0.2)),
+                              border: Border.all(color: badgeTextColor.withOpacity(0.1)),
                             ),
                             child: Text(
                               labelText,
@@ -199,7 +197,7 @@ class FavoriteCard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
