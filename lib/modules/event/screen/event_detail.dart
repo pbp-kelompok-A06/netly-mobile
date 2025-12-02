@@ -15,14 +15,29 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final Color _accentGreen = const Color(0xFFD7FC64);
   final Color _cancelBackground = const Color.fromARGB(255, 244, 48, 61); 
   final Color _whiteText = Colors.white;
+  final Color _disabledGrey = Colors.grey;
 
   // TODO: nanti variabel ini diambil dari backend
-  bool isJoined = false; 
+  bool isJoined = false;
+  late int currentParticipants; 
+
+    @override
+  void initState() {
+    super.initState();
+    // status awal join (default false)
+    isJoined = false; 
+
+    // jumlah peserta dari data event ke variabel state supaya bisa kita tambah/kurang nanti
+    currentParticipants = widget.event.participantCount;
+  }
 
   @override
   Widget build(BuildContext context) {
     // ambil tinggi layar
     final double screenHeight = MediaQuery.of(context).size.height;
+    bool isFull = currentParticipants >= widget.event.maxParticipants;
+    // tombol mati kalau udah penuh dan usernya belum join
+    bool isButtonDisabled = isFull && !isJoined;
 
     return Scaffold(
       backgroundColor: Colors.white, 
@@ -202,28 +217,55 @@ class _EventDetailPageState extends State<EventDetailPage> {
               ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isJoined ? _cancelBackground : _accentGreen, 
-                  foregroundColor: isJoined ? _whiteText : _primaryBlue,
+                  backgroundColor: isButtonDisabled 
+                      ? _disabledGrey 
+                      : (isJoined ? _cancelBackground : _accentGreen),
+                  
+                  foregroundColor: isButtonDisabled 
+                      ? Colors.white 
+                      : (isJoined ? _whiteText : _primaryBlue),
+                  
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 0,
                 ),
-                onPressed: () {
-                  // ini buat toggle button join atau cancel join
-                  setState(() {
-                    isJoined = !isJoined;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(isJoined ? "Berhasil Join Event!" : "Berhasil Keluar dari Event"),
-                      duration: const Duration(seconds: 1),
-                    ),
-                  );
-                },
+                onPressed: isButtonDisabled 
+                    ? null // ini buttonnya gabisa diklik
+                    : () {
+                        setState(() {
+                          if (isJoined) {
+                            // kalau user mau leave
+                            isJoined = false;
+                            currentParticipants--; // kurangi counter buat participants
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Berhasil Keluar dari Event"),
+                                backgroundColor: Colors.red,
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          } else {
+                            // join
+                            isJoined = true;
+                            currentParticipants++; // increment counter
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Berhasil Join Event!", style: TextStyle(color: _primaryBlue)),
+                                backgroundColor: _accentGreen,
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          }
+                        });
+                      },
                 child: Text(
-                  isJoined ? "Leave Event" : "Join Event Now",
+                  isButtonDisabled 
+                      ? "Kuota Penuh" 
+                      : (isJoined ? "Leave Event" : "Join Event Now"),
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),

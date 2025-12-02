@@ -14,9 +14,10 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  final Color _primaryBlue = const Color(0xFF243153);
-  final Color _accentGreen = const Color(0xFFD7FC64);
-  final Color _redFilter = const Color(0xFFC01B2E); 
+  final Color _primaryBlue = const Color(0xFF243153); // Warna Utama (Navy)
+  final Color _accentGreen = const Color(0xFFD7FC64); // Warna Aksen (Lime)
+  final Color _inactiveTrack = const Color(0xFFE0E0E0); // Abu-abu background track
+  final Color _inactiveText = const Color(0xFF757575);  // abu abu text kalau button inactive
 
   // sorting: true = ascending (terlama -> terbaru), false = descending
   bool _isAscending = true;
@@ -47,7 +48,7 @@ class _EventPageState extends State<EventPage> {
     ),
     EventEntry(
       id: "3",
-      name: "Latihan Rutin Pagi",
+      name: "sparring netly",
       description: "Latihan fisik dan teknik dasar.",
       location: "GOR Sumantri",
       startDate: DateTime.now().add(const Duration(days: 1)), // Besok (Paling cepat)
@@ -91,57 +92,97 @@ class _EventPageState extends State<EventPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // button untuk filter
+          
+          // section untuk filter
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: InkWell(
-              onTap: () {
-                // status sorting berubah saat diklik
-                setState(() {
-                  _isAscending = !_isAscending;
-                  _sortEvents(); // panggil fungsi sort 
-                });
-                
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(_isAscending ? "Urutan: Terlama ke Terbaru" : "Urutan: Terbaru ke Terlama"),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: _redFilter,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min, // supaya lebar container ngikutin isi
-                  children: [
-                    Text(
-                      "Date: ${_isAscending ? 'Ascending' : 'Descending'}",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      _isAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ],
-                ),
+            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            child: Text(
+              "Sort Date",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: _primaryBlue,
               ),
             ),
           ),
 
-          // pake expanded karena listview butuh parent dengan ukuran terbatas
-          Expanded( 
+          // untuk toggle button filter
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(4.0), 
+            height: 50,
+            decoration: BoxDecoration(
+              color: _inactiveTrack, 
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Row(
+              children: [
+                // button kiri untuk descending (latest ke earliest)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isAscending = false; 
+                        _sortEvents();
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200), // efek animasi smooth
+                      decoration: BoxDecoration(
+                        color: !_isAscending ? _primaryBlue : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Latest \u2192 Earliest", 
+                        style: TextStyle(
+                          // set warna text antara dia active dan ga active
+                          color: !_isAscending ? _accentGreen : _inactiveText,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // button kanan untuk earliest ke latest
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isAscending = true; 
+                        _sortEvents();
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: _isAscending ? _primaryBlue : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Earliest \u2192 Latest",
+                        style: TextStyle(
+                          color: _isAscending ? _accentGreen : _inactiveText,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16), 
+
+          // tampilin card event
+          Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 80),
+              padding: const EdgeInsets.only(bottom: 80), 
               itemCount: dummyEvents.length,
               itemBuilder: (context, index) {
                 return EventCard(event: dummyEvents[index]);
@@ -151,7 +192,6 @@ class _EventPageState extends State<EventPage> {
         ],
       ),
 
-      // Add New Event button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           showDialog(
