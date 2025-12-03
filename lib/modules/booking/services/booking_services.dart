@@ -139,7 +139,8 @@ class BookingService {
   Future<bool> completePayment(String bookingId) async {
     final url = '$pathWeb/booking/booking_detail/$bookingId/complete/';
 
-    final response = await request.post(url, {});
+    final response = await request.postJson(url, jsonEncode({}));
+  print("RESPONSE: $response");
 
     if (response is Map) {
       final Map<String, dynamic> data = response as Map<String, dynamic>;
