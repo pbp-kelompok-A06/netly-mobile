@@ -142,7 +142,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       const Icon(Icons.people, color: Color.fromARGB(255, 219, 219, 219), size: 18),
                       const SizedBox(width: 10),
                       Text(
-                        "${widget.event.participantCount} / ${widget.event.maxParticipants} Peserta",
+                        "$currentParticipants / ${widget.event.maxParticipants} Peserta",
                         style: TextStyle(color: _primaryBlue, fontWeight: FontWeight.w700, fontSize:12),
                       ),
 

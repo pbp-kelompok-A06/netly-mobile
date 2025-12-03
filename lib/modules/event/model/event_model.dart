@@ -14,6 +14,7 @@ class EventEntry {
     String imageUrl;
     int maxParticipants;
     int participantCount;
+    bool isJoined;    // boolean untuk cek status participant udah join atau belum
 
     EventEntry({
         required this.id,
@@ -25,29 +26,34 @@ class EventEntry {
         required this.imageUrl,
         required this.maxParticipants,
         required this.participantCount,
+        required this.isJoined,
     });
 
     factory EventEntry.fromJson(Map<String, dynamic> json) => EventEntry(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        location: json["location"],
-        startDate: DateTime.parse(json["start_date"]),
-        endDate: DateTime.parse(json["end_date"]),
-        imageUrl: json["image_url"] ?? "",          // null handling
-        maxParticipants: json["max_participants"],
-        participantCount: json["participant_count"] ?? 0, 
+        id: json["pk"],
+        name: json["fields"]["name"], 
+        description: json["fields"]["description"],
+        location: json["fields"]["location"],
+        startDate: DateTime.parse(json["fields"]["start_date"]),
+        endDate: DateTime.parse(json["fields"]["end_date"]),
+        imageUrl: json["fields"]["image_url"] ?? "",
+        maxParticipants: json["fields"]["max_participants"],
+        participantCount: json["fields"]["participant_count"] ?? 0,
+        isJoined: json["fields"]["is_joined"] ?? false, // Ambil status join
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "description": description,
-        "location": location,
-        "start_date": "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
-        "end_date": "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
-        "image_url": imageUrl,
-        "max_participants": maxParticipants,
-        "participant_count": participantCount,
+        "pk": id,
+        "fields": {
+            "name": name,
+            "description": description,
+            "location": location,
+            "start_date": startDate.toIso8601String(),
+            "end_date": endDate.toIso8601String(),
+            "image_url": imageUrl,
+            "max_participants": maxParticipants,
+            "participant_count": participantCount,
+            "is_joined": isJoined,
+        }
     };
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-// import 'package:pbp_django_auth/pbp_django_auth.dart'; 
-// import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart';
 
 import 'package:netly_mobile/modules/event/model/event_model.dart';
 import 'package:netly_mobile/modules/event/widgets/event_card.dart';
 import 'package:netly_mobile/modules/event/screen/form.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage({super.key});
@@ -14,79 +14,49 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  final Color _primaryBlue = const Color(0xFF243153); // Warna Utama (Navy)
-  final Color _accentGreen = const Color(0xFFD7FC64); // Warna Aksen (Lime)
-  final Color _inactiveTrack = const Color(0xFFE0E0E0); // Abu-abu background track
+  final Color _primaryBlue = const Color(0xFF243153);
+  final Color _accentGreen = const Color(0xFFD7FC64); 
+  final Color _inactiveTrack = const Color(0xFFE0E0E0); 
   final Color _inactiveText = const Color(0xFF757575);  // abu abu text kalau button inactive
 
   // sorting: true = ascending (terlama -> terbaru), false = descending
-  bool _isAscending = true;
+  bool _isAscending = false;
 
-  // dummy data untuk cek tampilan
-  final List<EventEntry> dummyEvents = [
-    EventEntry(
-      id: "1",
-      name: "Mabar Badminton Ceria",
-      description: "Main bareng santai untuk pemula.",
-      location: "GOR Cempaka Putih",
-      startDate: DateTime.now(),
-      endDate: DateTime.now(),
-      imageUrl: "https://via.placeholder.com/150", 
-      maxParticipants: 10,
-      participantCount: 5,
-    ),
-    EventEntry(
-      id: "2",
-      name: "Turnamen Netly Cup",
-      description: "Turnamen serius hadiah raket.",
-      location: "GOR Ragunan",
-      startDate: DateTime.now().add(const Duration(days: 2)),
-      endDate: DateTime.now().add(const Duration(days: 2)),
-      imageUrl: "https://via.placeholder.com/150", 
-      maxParticipants: 20,
-      participantCount: 20,
-    ),
-    EventEntry(
-      id: "3",
-      name: "sparring netly",
-      description: "Latihan fisik dan teknik dasar.",
-      location: "GOR Sumantri",
-      startDate: DateTime.now().add(const Duration(days: 1)), // Besok (Paling cepat)
-      endDate: DateTime.now().add(const Duration(days: 1)),
-      imageUrl: "https://via.placeholder.com/150", 
-      maxParticipants: 8,
-      participantCount: 2,
-    ),
-  ];
+  Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
+    final response = await request.get('http://localhost:8000/event/show-even');
 
-  @override
-  void initState() {
-    super.initState();
-    // default sortnya ascending
-    _sortEvents();
-  }
-
-  // untuk handle sorting event berdasarkan tanggal
-  void _sortEvents() {
-    setState(() {
-      if (_isAscending) {
-        // ascending: tanggal kecil (lama) ke besar (baru)
-        dummyEvents.sort((a, b) => a.startDate.compareTo(b.startDate));
-      } else {
-        // descending: tanggal besar (baru) ke kecil (lama)
-        dummyEvents.sort((b, a) => a.startDate.compareTo(b.startDate));
+    // convert Json dari django ke List<EventEntry>
+    var data = response;
+    List<EventEntry> listEvents = [];
+    for (var things in data) {
+      if ( things != null) {
+        listEvents.add(EventEntry.fromJson(things));
       }
-    });
+    }
+
+    // logic untuk sorting
+    if (_isAscending) {
+      listEvents.sort((a, b) => a.startDate.compareTo(b.startDate));
+    } else {
+      listEvents.sort((b, a) => a.startDate.compareTo(b.startDate));
+    }
+
+    return listEvents;
   }
 
-  @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>(); // Akses request
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('All Events', style: TextStyle(
           fontWeight: FontWeight.bold,
         )),
+        backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF243153),
+        elevation: 0,
+        surfaceTintColor: Colors.white,
       ),
 
       body: Column(
@@ -123,7 +93,6 @@ class _EventPageState extends State<EventPage> {
                     onTap: () {
                       setState(() {
                         _isAscending = false; 
-                        _sortEvents();
                       });
                     },
                     child: AnimatedContainer(
@@ -152,7 +121,7 @@ class _EventPageState extends State<EventPage> {
                     onTap: () {
                       setState(() {
                         _isAscending = true; 
-                        _sortEvents();
+                        // HAPUS _sortEvents();
                       });
                     },
                     child: AnimatedContainer(
@@ -179,13 +148,24 @@ class _EventPageState extends State<EventPage> {
           
           const SizedBox(height: 16), 
 
-          // tampilin card event
+          // tampilin card event pakai FutureBuilder
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 80), 
-              itemCount: dummyEvents.length,
-              itemBuilder: (context, index) {
-                return EventCard(event: dummyEvents[index]);
+            child: FutureBuilder(
+              future: fetchEvents(request), // panggil fungsi fetch
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.data == null) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("Belum ada event."));
+                  } else {
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 80),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (_, index) => EventCard(event: snapshot.data![index]),
+                    );
+                  }
+                }
               },
             ),
           ),
