@@ -1,57 +1,62 @@
 import 'dart:convert';
 
-List<Forum> forumFromJson(String str) => List<Forum>.from(json.decode(str).map((x) => Forum.fromJson(x)));
+// Fungsi helper untuk membaca JSON string menjadi Object
+ForumResponse forumResponseFromJson(String str) => ForumResponse.fromJson(json.decode(str));
 
-String forumToJson(List<Forum> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+// Fungsi helper untuk mengubah Object kembali menjadi JSON string
+String forumResponseToJson(ForumResponse data) => json.encode(data.toJson());
 
-class Forum {
-    bool sucesss;
+class ForumResponse {
+    bool success;
     String msg;
-    List<Datum> data;
+    List<ForumData> data;
 
-    Forum({
-        required this.sucesss,
+    ForumResponse({
+        required this.success,
         required this.msg,
         required this.data,
     });
 
-    factory Forum.fromJson(Map<String, dynamic> json) => Forum(
-        sucesss: json["sucesss"],
+    factory ForumResponse.fromJson(Map<String, dynamic> json) => ForumResponse(
+        success: json["success"], 
         msg: json["msg"],
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        data: List<ForumData>.from(json["data"].map((x) => ForumData.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
-        "sucesss": sucesss,
+        "sucesss": success,
         "msg": msg,
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
     };
 }
 
-class Datum {
+class ForumData {
     String id;
     String creatorId;
     String title;
     String description;
-    bool? isMember;
+    int memberCount;
+    bool isMember;
     DateTime createdAt;
     DateTime updatedAt;
 
-    Datum({
+    ForumData({
         required this.id,
         required this.creatorId,
         required this.title,
         required this.description,
-        this.isMember,
+        required this.memberCount,
+        required this.isMember,
         required this.createdAt,
         required this.updatedAt,
     });
 
-    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+    factory ForumData.fromJson(Map<String, dynamic> json) => ForumData(
         id: json["id"],
         creatorId: json["creator_id"],
         title: json["title"],
         description: json["description"],
+        memberCount: json['member_count'],
         isMember: json["is_member"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
