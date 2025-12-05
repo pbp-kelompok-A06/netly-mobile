@@ -17,14 +17,14 @@ class ForumShowPage extends StatefulWidget {
 class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  // add tabController
+  // add TabController
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
   }
 
-  // fetch async
+  // fetch Async
   Future<List<ForumData>> fetchForum(CookieRequest request) async {
     request.headers['X-Requested-With'] = 'XMLHttpRequest';
     final response = await request.get('$pathWeb/community/');
@@ -210,7 +210,8 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
         return Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
           child: ForumCard(
-            data: data[index]
+            data: data[index],
+            myForum: true,
           ),
         );
       },
