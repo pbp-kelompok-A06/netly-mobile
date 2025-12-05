@@ -5,23 +5,35 @@ import '../screen/forum_post_page.dart';
 
 class ForumCard extends StatelessWidget {
   final ForumData data;
+  final bool myForum;
 
   const ForumCard({
     super.key,
     required this.data,
+    this.myForum = false
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ForumPostPage(forumData: data)),
-        );
+        // check user is part of member of forum or not
+        if(data.isMember == true){
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ForumPostPage(forumData: data)),
+          );
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+            content: Text('You are not a member of ${data.title}!'),
+            backgroundColor: Colors.red,
+        ));
+        }
+       
       },
+      // forum card
       child: Container(
-        width: 140, 
+        width: 200, 
         height: 140,
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(16),
@@ -40,37 +52,116 @@ class ForumCard extends StatelessWidget {
             ),
           ],
         ),
+        // details of Forum
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          
           children: [
             // Title Forum
+            Row(
+              children: [
+                Text(
+                  data.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+
+                if (myForum)
+                  Row(
+                    children: [
+                      // Edit Icon
+                      InkWell(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Edit clicked"))
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 8.0, bottom: 4.0),
+                          child: Icon(Icons.edit, color: Colors.white, size: 20),
+                        ),
+                      ),
+                      
+                      // Delete Icon
+                      InkWell(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Delete clicked"))
+                          );
+                          
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 8.0, bottom: 4.0),
+                          child: Icon(Icons.delete_outline, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    ]
+                  )
+                ] 
+            ),
+            // Description Forum
             Text(
-              data.title,
+              data.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: 12,
               ),
             ),
-            // Jumlah Member
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                "${data.memberCount} Members",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+            // Jumlah Member and Creator Name
+            Row(
+              children: [
+                // Jumlah member
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+
+                  child: 
+                      Text(
+                        "${data.memberCount} Members",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ), 
                 ),
-              ),
+                const SizedBox(width: 2.5),
+                // Nama Creator
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: 
+                      Text(
+                        data.creatorName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ), 
+                ),
+
+                
+                
+              ],
             ),
+            
+              
+            
             
           ],
         ),
