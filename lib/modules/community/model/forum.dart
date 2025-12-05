@@ -33,20 +33,22 @@ class ForumResponse {
 class ForumData {
     String id;
     String creatorId;
+    String creatorName;
     String title;
     String description;
-    int memberCount;
-    bool isMember;
+    int? memberCount;
+    bool? isMember;
     DateTime createdAt;
     DateTime updatedAt;
 
     ForumData({
         required this.id,
         required this.creatorId,
+        required this.creatorName,
         required this.title,
         required this.description,
-        required this.memberCount,
-        required this.isMember,
+        this.memberCount,
+        this.isMember,
         required this.createdAt,
         required this.updatedAt,
     });
@@ -54,6 +56,7 @@ class ForumData {
     factory ForumData.fromJson(Map<String, dynamic> json) => ForumData(
         id: json["id"],
         creatorId: json["creator_id"],
+        creatorName: json["creator_name"],
         title: json["title"],
         description: json["description"],
         memberCount: json['member_count'],
@@ -65,6 +68,7 @@ class ForumData {
     Map<String, dynamic> toJson() => {
         "id": id,
         "creator_id": creatorId,
+        "creator_name": creatorName,
         "title": title,
         "description": description,
         "is_member": isMember,
