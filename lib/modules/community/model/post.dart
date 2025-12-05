@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 PostResponse postResponseFromJson(String str) => PostResponse.fromJson(json.decode(str));
-
 String postResponseToJson(PostResponse data) => json.encode(data.toJson());
 
 class PostResponse {
@@ -28,7 +27,6 @@ class PostResponse {
         "success": success,
         "msg": msg,
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
-        "current_user_id": currentUserId,
     };
 }
 
@@ -56,11 +54,8 @@ class PostData {
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id,
         "header": header,
         "content": content,
-        "created_at": createdAt.toIso8601String(),
-        "user": user.toJson(),
     };
 }
 

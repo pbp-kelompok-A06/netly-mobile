@@ -1,9 +1,6 @@
 import 'dart:convert';
 
-// Fungsi helper untuk membaca JSON string menjadi Object
 ForumResponse forumResponseFromJson(String str) => ForumResponse.fromJson(json.decode(str));
-
-// Fungsi helper untuk mengubah Object kembali menjadi JSON string
 String forumResponseToJson(ForumResponse data) => json.encode(data.toJson());
 
 class ForumResponse {
@@ -65,14 +62,8 @@ class ForumData {
         updatedAt: DateTime.parse(json["updated_at"]),
     );
 
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "creator_id": creatorId,
-        "creator_name": creatorName,
+    Map<String, dynamic> toJson() => { 
         "title": title,
         "description": description,
-        "is_member": isMember,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
     };
 }
