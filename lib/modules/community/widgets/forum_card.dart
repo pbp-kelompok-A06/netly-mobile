@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:netly_mobile/modules/community/model/forum.dart';
-import 'package:netly_mobile/modules/community/screen/forum_detail_page.dart';
+import '../model/forum.dart';
+import '../../../utils/colors.dart';
+import '../screen/forum_post_page.dart'; 
 
 class ForumCard extends StatelessWidget {
-  final Forum forum;
+  final ForumData data;
 
-  const ForumCard({super.key, required this.forum});
+  const ForumCard({
+    super.key,
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,69 +17,61 @@ class ForumCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => ForumDetailPage(forum: forum),
-          ),
+          MaterialPageRoute(builder: (context) => ForumPostPage(forumData: data)),
         );
       },
       child: Container(
+        width: 140, 
+        height: 140,
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: forum.gradientColors,
+          gradient: const LinearGradient(
+            colors: [AppColors.gradientStartCommunity, AppColors.gradientEndCommunity],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20), 
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.gradientStartCommunity.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    forum.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_forward, color: Colors.white),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+            // Title Forum
             Text(
-              forum.description,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 14,
+              data.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(Icons.people, color: Colors.white.withOpacity(0.9), size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  '${forum.members} Members',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 13,
-                  ),
+            // Jumlah Member
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "${data.memberCount} Members",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
+              ),
             ),
+            
           ],
         ),
       ),
