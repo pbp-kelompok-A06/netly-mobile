@@ -6,13 +6,15 @@ class ThreadPostCard extends StatelessWidget {
   final String content;
   final String userName;
   final String timeAgo;
+  final String forumName;
 
   const ThreadPostCard({
     super.key,
     required this.title,
     required this.content,
     required this.userName,
-    required this.timeAgo
+    required this.timeAgo,
+    this.forumName = ""
   });
 
   @override
@@ -51,14 +53,31 @@ class ThreadPostCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Thread Title
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: AppColors.textPrimaryCommunity,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.textPrimaryCommunity,
+                          ),
+                        ),
+                        if(forumName != "")
+                        const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: Text("•", style: TextStyle(color: Colors.grey)),
+                        ),
+                        Text(
+                          "Forum: $forumName",
+                          style: const TextStyle(
+                            color: AppColors.textSecondaryCommunity,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ]
                     ),
+                    
                     const SizedBox(height: 4),
                     // User info & post timeAgo
                     Row(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/community/model/post.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:provider/provider.dart'; 
 import 'package:pbp_django_auth/pbp_django_auth.dart'; 
@@ -23,7 +24,15 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
   }
-
+  String timeAgo(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays > 365) return "${(diff.inDays / 365).floor()}y ago";
+    if (diff.inDays > 30) return "${(diff.inDays / 30).floor()}mo ago";
+    if (diff.inDays > 0) return "${diff.inDays}d ago";
+    if (diff.inHours > 0) return "${diff.inHours}h ago";
+    if (diff.inMinutes > 0) return "${diff.inMinutes}m ago";
+    return "Just now";
+  }
   // fetch Async
   Future<List<ForumData>> fetchForum(CookieRequest request) async {
     request.headers['X-Requested-With'] = 'XMLHttpRequest';
@@ -38,6 +47,17 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
       }
     }
     return listForum;
+  }
+
+  Future<List<PostData>> fetchPosts(CookieRequest request) async {
+    final String url = '$pathWeb/community/forum/post/recent/3/';
+    
+    final response = await request.get(url);
+    
+    PostResponse postResponse = PostResponse.fromJson(response);
+   
+    return postResponse.data;
+    
   }
 
   @override
@@ -101,7 +121,7 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
             return TabBarView(
               controller: _tabController,
               children: [
-                _buildHomeTab(joinedForums),
+                _buildHomeTab(joinedForums, request),
                 _buildExploreTab(exploreForums),
                 _buildMyForumTab(myForums),
               ],
@@ -113,7 +133,7 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
   }
 
 
-  Widget _buildHomeTab(List<ForumData> data) {
+  Widget _buildHomeTab(List<ForumData> data, CookieRequest request) {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -159,18 +179,42 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
             ),
           ),
           
-          ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: 3, 
-            itemBuilder: (context, index) {
-              return ThreadPostCard(
-                title: "Diskusi Hangat #${index + 1}",
-                userName: "User ${index + 1}",
-                timeAgo: "${index + 1}h ago",
-                content: "Ini adalah contoh konten thread...",
-              );
+          FutureBuilder<List<PostData>>(
+            future: fetchPosts(request), 
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(),
+                ));
+              } else if (snapshot.hasError) {
+                return Center(child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text("Error loading posts: ${snapshot.error}", style: const TextStyle(color: Colors.red)),
+                ));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text("No recent posts available."),
+                ));
+              } else {
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length, 
+                  itemBuilder: (context, index) {
+                    final post = snapshot.data![index];
+                    return ThreadPostCard(
+                      title: post.header,
+                      userName: post.user.username,
+                      timeAgo: timeAgo(post.createdAt),
+                      content: post.content,
+                      forumName: post.forumName!,
+                    );
+                  },
+                );
+              }
             },
           ),
         ],
