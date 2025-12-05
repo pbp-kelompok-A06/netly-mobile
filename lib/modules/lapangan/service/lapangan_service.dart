@@ -7,15 +7,40 @@ class LapanganService {
 
   LapanganService(this.request);
 
-  // Fetch all lapangan
-  Future<LapanganModel?> fetchAllLapangan({String search = ''}) async {
-    try {
-      String url = '${pathWeb['localhost']}/lapangan/api/lapangan/';
+  // Get base URL
+  String get baseUrl => pathWeb['localhost']!;
 
-      if (search.isNotEmpty) {
-        url += '?search=$search';
+  // Fetch all lapangan
+  Future<LapanganModel?> fetchAllLapangan({
+    String search = '',
+    bool? myLapangan,
+  }) async {
+    try {
+      String url;
+
+      // Pisahkan URL tujuan berdasarkan apakah user ingin melihat "My Lapangan" atau semua.
+      if (myLapangan == true) {
+        url = '$baseUrl/lapangan/api/my-lapangan/'; 
+      } else {
+        // URL default untuk mengambil semua lapangan (publik)
+        url = '$baseUrl/lapangan/api/lapangan/';
       }
 
+      // Handle Query Params (khususnya Search)
+      // Kode Django Anda menerima 'search' via request.GET.get('search')
+      List<String> queryParams = [];
+      if (search.isNotEmpty) {
+        queryParams.add('search=$search');
+      }
+
+      // Gabungkan URL dengan query params jika ada
+      if (queryParams.isNotEmpty) {
+        url += '?${queryParams.join('&')}';
+      }
+
+      // Lakukan request GET
+      // CookieRequest akan otomatis membawa session ID user yang login,
+      // sehingga 'request.user' di Django akan terdeteksi.
       final response = await request.get(url);
 
       if (response != null) {
@@ -23,24 +48,22 @@ class LapanganService {
       }
       return null;
     } catch (e) {
-      print('Error fetching lapangan: $e');
       return null;
     }
   }
 
-  // Fetch lapangan detail
-  Future<Map<String, dynamic>?> fetchLapanganDetail(String id) async {
+  // Fetch single lapangan detail
+  Future<Datum?> fetchLapanganDetail(String id) async {
     try {
       final response = await request.get(
-        '${pathWeb['localhost']}/lapangan/api/lapangan/$id/',
+        '$baseUrl/lapangan/api/lapangan/$id/',
       );
 
       if (response != null && response['status'] == 'success') {
-        return response['data'];
+        return Datum.fromJson(response['data']);
       }
       return null;
     } catch (e) {
-      print('Error fetching lapangan detail: $e');
       return null;
     }
   }
@@ -53,35 +76,33 @@ class LapanganService {
     required String price,
     String? image,
   }) async {
-    
-      final url = '${pathWeb['localhost']}/lapangan/create-flutter/';
-      final data = {
-        'name': name,
-        'location': location,
-        'description': description,
-        'price': price,
-        'image': image ?? '',
+    final url = '$baseUrl/lapangan/create-flutter/';
+    final data = {
+      'name': name,
+      'location': location,
+      'description': description,
+      'price': price,
+      'image': image ?? '',
+    };
+
+    final response = await request.post(url, data);
+
+    if (response['status'] == 'success') {
+      return {
+        'success': true,
+        'message': response['message'] ?? 'Court successfully added!',
+        'data': response['data'],
       };
-
-      final response = await request.post(url, data);
-
-      if (response['status'] == 'success') {
-        return {
-          'success': true,
-          'message': response['message'] ?? 'Lapangan berhasil ditambahkan!',
-          'data': response['data'],
-        };
-      } else {
-        return {
-          'success': false,
-          'message': response['message'] ?? 'Gagal menambahkan lapangan',
-        };
-      
+    } else {
+      return {
+        'success': false,
+        'message': response['message'] ?? 'Failed to add Court',
+      };
     }
   }
 
-  // Edit lapangan (admin only)
-  Future<Map<String, dynamic>> editLapangan({
+  // Update lapangan (admin only)
+  Future<Map<String, dynamic>> updateLapangan({
     required String id,
     required String name,
     required String location,
@@ -89,63 +110,66 @@ class LapanganService {
     required String price,
     String? image,
   }) async {
-    try {
-      // Fixed URL - remove duplicate /lapangan/
-      final response = await request
-          .post('${pathWeb['localhost']}/lapangan/ajax/edit/$id/', {
-            'name': name,
-            'location': location,
-            'description': description,
-            'price': price,
-            'image': image ?? '',
-          });
+    // GUNAKAN FORMAT YANG SAMA DENGAN CREATE
+    final url = '$baseUrl/lapangan/edit-flutter/$id/';
+    final data = {
+      'name': name,
+      'location': location,
+      'description': description,
+      'price': price,
+      'image': image ?? '',
+    };
 
-      if (response['status'] == 'success') {
-        return {
-          'success': true,
-          'message': response['message'] ?? 'Lapangan berhasil diperbarui!',
-        };
-      } else {
-        return {
-          'success': false,
-          'message': response['message'] ?? 'Gagal memperbarui lapangan',
-        };
-      }
-    } catch (e) {
-      print('Error editing lapangan: $e');
+    final response = await request.post(url, data);
+    if (response['status'] == 'success') {
+      return {
+        'success': true,
+        'message': response['message'] ?? 'Court successfully updated!',
+        'data': response.containsKey('data') ? response['data'] : null,
+      };
+    } else {
       return {
         'success': false,
-        'message': 'Terjadi kesalahan: ${e.toString()}',
+        'message': response['message'] ?? 'Failed to update field',
       };
     }
   }
 
   // Delete lapangan (admin only)
   Future<Map<String, dynamic>> deleteLapangan(String id) async {
-    try {
-      // Fixed URL - remove duplicate /lapangan/
-      final response = await request.post(
-        '${pathWeb['localhost']}/lapangan/ajax/delete/$id/',
-        {},
-      );
+    final url = '$baseUrl/lapangan/delete-flutter/$id/';
 
-      if (response['status'] == 'success') {
-        return {
-          'success': true,
-          'message': response['message'] ?? 'Lapangan berhasil dihapus!',
-        };
-      } else {
-        return {
-          'success': false,
-          'message': response['message'] ?? 'Gagal menghapus lapangan',
-        };
-      }
-    } catch (e) {
-      print('Error deleting lapangan: $e');
+    final response = await request.post(url, {});
+
+    if (response['status'] == 'success') {
+      return {
+        'success': true,
+        'message': response['message'] ?? 'Field successfully deleted!',
+      };
+    } else {
       return {
         'success': false,
-        'message': 'Terjadi kesalahan: ${e.toString()}',
+        'message': response['message'] ?? 'Failed to delete field',
       };
+    }
+  }
+
+  // Check if user is admin
+  bool isUserAdmin() {
+    try {
+      final userData = request.jsonData['userData'];
+      return userData != null && userData['role'] == 'admin';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Get current user info
+  Map<String, dynamic>? getCurrentUser() {
+    try {
+      return request.jsonData['userData'];
+    } catch (e) {
+      return null;
     }
   }
 }
