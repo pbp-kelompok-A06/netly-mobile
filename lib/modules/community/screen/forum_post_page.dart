@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/utils/path_web.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import '../model/forum.dart';
-import '../../../utils/colors.dart'; // Menggunakan constants yang baru
-import '../widgets/thread_post_card.dart'; // Pastikan arahnya ke widget card yang baru
+import '../model/post.dart'; 
+import '../../../utils/colors.dart'; 
+import '../widgets/thread_post_card.dart';
 
 class ForumPostPage extends StatefulWidget {
   final ForumData forumData;
@@ -15,16 +19,81 @@ class ForumPostPage extends StatefulWidget {
 class _ForumPostPageState extends State<ForumPostPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+  
+  late Future<List<PostData>> _threadPosts;
 
   @override
-  void dispose() {
-    _titleController.dispose();
-    _contentController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    final request = context.read<CookieRequest>();
+    _threadPosts = fetchPosts(request);
+  }
+
+
+  Future<List<PostData>> fetchPosts(CookieRequest request) async {
+    final String url = '$pathWeb/community/forum/post/${widget.forumData.id}/';
+    
+    final response = await request.get(url);
+    
+    PostResponse postResponse = PostResponse.fromJson(response);
+   
+    return postResponse.data;
+    
+  }
+
+  Future<void> createPost(CookieRequest request) async {
+    request.headers['X-Requested-With'] = 'XMLHttpRequest';
+    final String url = '$pathWeb/community/create-post/${widget.forumData.id}/';
+    
+    final response = await request.post(url, {
+        'header': _titleController.text,
+        'content': _contentController.text,
+    });
+
+    if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Thread posted successfully!"),
+            backgroundColor: Colors.green,
+        ));
+        
+        // Cleaning input field
+        _titleController.clear();
+        _contentController.clear();
+        FocusScope.of(context).unfocus();
+
+        // Refresh list
+        setState(() {
+            _threadPosts = fetchPosts(request);
+        });
+    } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(response['msg'] ?? "Failed to post thread."),
+            backgroundColor: Colors.red,
+        ));
+    }
+  }
+
+  String _timeAgo(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays > 365) return "${(diff.inDays / 365).floor()}y ago";
+    if (diff.inDays > 30) return "${(diff.inDays / 30).floor()}mo ago";
+    if (diff.inDays > 0) return "${diff.inDays}d ago";
+    if (diff.inHours > 0) return "${diff.inHours}h ago";
+    if (diff.inMinutes > 0) return "${diff.inMinutes}m ago";
+    return "Just now";
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    
+    String currentUsername = "User";
+    if (request.jsonData.isNotEmpty && 
+        request.jsonData['userData'] != null && 
+        request.jsonData['userData']['username'] != null) {
+        currentUsername = request.jsonData['userData']['username'];
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -34,7 +103,16 @@ class _ForumPostPageState extends State<ForumPostPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.grey),
           onPressed: () => Navigator.pop(context),
         ),
-       
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.grey),
+            onPressed: () {
+              setState(() {
+                _threadPosts = fetchPosts(request);
+              });
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -47,16 +125,15 @@ class _ForumPostPageState extends State<ForumPostPage> {
                 children: [
                   // Avatar
                   CircleAvatar(
-                    backgroundColor: AppColors.gradientStartCommunity.withOpacity(0.2),
-                    radius: 22,
-                    child: const Text("ME", style: TextStyle(color: AppColors.gradientStartCommunity, fontWeight: FontWeight.bold)),
+                    radius: 20,
+                    backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=$currentUsername&size=40&background=random'),
+                    backgroundColor: Colors.grey.shade200,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // FORM BIKIN POST
                         // Input Judul
                         TextField(
                           controller: _titleController,
@@ -86,11 +163,12 @@ class _ForumPostPageState extends State<ForumPostPage> {
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
                             onPressed: () {
-                              if (_titleController.text.isNotEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Posting thread...")));
-                                _titleController.clear();
-                                _contentController.clear();
-                                FocusScope.of(context).unfocus();
+                              if (_titleController.text.isNotEmpty && _contentController.text.isNotEmpty) {
+                                createPost(request);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                    content: Text("Please fill in both title and content"),
+                                ));
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -112,7 +190,6 @@ class _ForumPostPageState extends State<ForumPostPage> {
             
             const Divider(thickness: 1, color: Color(0xFFEEEEEE)),
 
-            // Header Feed
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
               child: Row(
@@ -130,33 +207,44 @@ class _ForumPostPageState extends State<ForumPostPage> {
               ),
             ),
             
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  ThreadPostCard(
-                    title: "Diskusi hari ini",
-                    content: "Apakah ada yang sudah mencoba fitur baru Flutter 3.24? Sepertinya performa Impeller makin bagus.",
-                    userName: "BaruJoin",
-                    timeAgo: "2h ago",
-                    
-                  ),
-                  ThreadPostCard(
-                    title: "Tanya soal State Management",
-                    content: "Bingung milih antara Riverpod atau Bloc untuk project skala menengah. Ada saran?",
-                    userName: "HaloDunia",
-                    timeAgo: "5h ago",
-                  
-                  ),
-                   ThreadPostCard(
-                    title: "Showcase Project",
-                    content: "Baru aja rilis aplikasi to-do list sederhana pake Clean Architecture. Cek github saya ya!",
-                    userName: "DevPemula",
-                    timeAgo: "1d ago",
-                   
-                  ),
-                ],
-              ),
+            FutureBuilder<List<PostData>>(
+              future: _threadPosts,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: CircularProgressIndicator(),
+                  ));
+                } else if (snapshot.hasError) {
+                  return Center(child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.red)),
+                  ));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text("No threads yet. Be the first to post!", style: TextStyle(color: Colors.grey)),
+                  ));
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(), // Scroll ikut parent
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final post = snapshot.data![index];
+                        return ThreadPostCard(
+                          title: post.header,
+                          content: post.content,
+                          userName: post.user.username,
+                          timeAgo: _timeAgo(post.createdAt),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
             ),
             
             const SizedBox(height: 30),
