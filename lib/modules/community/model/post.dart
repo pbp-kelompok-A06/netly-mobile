@@ -36,6 +36,7 @@ class PostData {
     String content;
     DateTime createdAt;
     UserPost user;
+    String? forumName;
 
     PostData({
         required this.id,
@@ -43,12 +44,14 @@ class PostData {
         required this.content,
         required this.createdAt,
         required this.user,
+        this.forumName
     });
 
     factory PostData.fromJson(Map<String, dynamic> json) => PostData(
         id: json["id"],
         header: json["header"],
         content: json["content"],
+        forumName: json["forum_name"],
         createdAt: DateTime.parse(json["created_at"]),
         user: UserPost.fromJson(json["user"]),
     );
