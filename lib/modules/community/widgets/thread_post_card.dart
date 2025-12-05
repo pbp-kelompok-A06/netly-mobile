@@ -41,7 +41,7 @@ class ThreadPostCard extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 20,
-                backgroundImage: const NetworkImage('https://i.pravatar.cc/150'),
+                backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=$userName&size=40&background=random'),
                 backgroundColor: Colors.grey.shade200,
               ),
               const SizedBox(width: 12),
@@ -66,7 +66,7 @@ class ThreadPostCard extends StatelessWidget {
                         Text(
                           userName,
                           style: const TextStyle(
-                            color: AppColors.joinButtonCommunity, // Warna biru user
+                            color: AppColors.joinButtonCommunity, 
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
