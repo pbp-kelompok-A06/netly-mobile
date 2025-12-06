@@ -23,7 +23,7 @@ class _EventPageState extends State<EventPage> {
   bool _isAscending = false;
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/event/show_events_flutter');
+    final response = await request.get('http://localhost:8000/event/show-events-flutter/');
 
     // convert Json dari django ke List<EventEntry>
     var data = response;
@@ -152,18 +152,42 @@ class _EventPageState extends State<EventPage> {
             child: FutureBuilder(
               future: fetchEvents(request), // panggil fungsi fetch
               builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
+                // 1. KONDISI LOADING
+                if (snapshot.data == null && snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else {
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("Belum ada event."));
-                  } else {
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (_, index) => EventCard(event: snapshot.data![index]),
-                    );
-                  }
+                } 
+                
+                // 2. KONDISI ERROR (PENTING BIAR KETAWAN ERRORNYA APA)
+                else if (snapshot.hasError) {
+                   return Center(
+                     child: Padding(
+                       padding: const EdgeInsets.all(20.0),
+                       child: Text(
+                         "Error: ${snapshot.error}", 
+                         style: const TextStyle(color: Colors.red),
+                         textAlign: TextAlign.center,
+                       ),
+                     ),
+                   );
+                }
+
+                // 3. KONDISI DATA KOSONG / NULL
+                else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "Belum ada event.",
+                      style: TextStyle(color: Color(0xFF243153), fontSize: 20),
+                    ),
+                  );
+                } 
+                
+                // 4. KONDISI BERHASIL
+                else {
+                  return ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 80),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (_, index) => EventCard(event: snapshot.data![index]),
+                  );
                 }
               },
             ),

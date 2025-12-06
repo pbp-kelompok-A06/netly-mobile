@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/event/model/event_model.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class EventDetailPage extends StatefulWidget {
   final EventEntry event;
@@ -17,22 +21,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final Color _whiteText = Colors.white;
   final Color _disabledGrey = Colors.grey;
 
-  // TODO: nanti variabel ini diambil dari backend
   bool isJoined = false;
   late int currentParticipants; 
 
-    @override
+  @override
   void initState() {
     super.initState();
     // status awal join (default false)
-    isJoined = false; 
-
-    // jumlah peserta dari data event ke variabel state supaya bisa kita tambah/kurang nanti
+    isJoined = widget.event.isJoined; 
     currentParticipants = widget.event.participantCount;
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     // ambil tinggi layar
     final double screenHeight = MediaQuery.of(context).size.height;
     bool isFull = currentParticipants >= widget.event.maxParticipants;
@@ -232,35 +234,34 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   elevation: 0,
                 ),
                 onPressed: isButtonDisabled 
-                    ? null // ini buttonnya gabisa diklik
-                    : () {
-                        setState(() {
-                          if (isJoined) {
-                            // kalau user mau leave
-                            isJoined = false;
-                            currentParticipants--; // kurangi counter buat participants
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Berhasil Keluar dari Event"),
-                                backgroundColor: Colors.red,
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
+                    ? null 
+                    : () async {
+                        // send request ke django ->  endpoint: /event/join-flutter/<uuid>/
+                        final response = await request.postJson(
+                          "http://localhost:8000/event/join-flutter/${widget.event.id}/",
+                          jsonEncode({}),
+                        );
+
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            // 3. Update UI berdasarkan respon server
+                            setState(() {
+                              if (response['action'] == 'join') {
+                                isJoined = true;
+                                currentParticipants++;
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Join!"), backgroundColor: Colors.green));
+                              } else {
+                                isJoined = false;
+                                currentParticipants--;
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Leave!"), backgroundColor: Colors.red));
+                              }
+                            });
                           } else {
-                            // join
-                            isJoined = true;
-                            currentParticipants++; // increment counter
-                            
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Berhasil Join Event!", style: TextStyle(color: _primaryBlue)),
-                                backgroundColor: _accentGreen,
-                                duration: const Duration(seconds: 1),
-                              ),
+                              SnackBar(content: Text(response['message'] ?? "Gagal")),
                             );
                           }
-                        });
+                        }
                       },
                 child: Text(
                   isButtonDisabled 
