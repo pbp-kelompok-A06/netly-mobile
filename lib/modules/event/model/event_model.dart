@@ -39,7 +39,7 @@ class EventEntry {
         imageUrl: json["fields"]["image_url"] ?? "",
         maxParticipants: json["fields"]["max_participants"],
         participantCount: json["fields"]["participant_count"] ?? 0,
-        isJoined: json["fields"]["is_joined"] ?? false, // Ambil status join
+        isJoined: json["fields"]["is_joined"] ?? false, // status join
     );
 
     Map<String, dynamic> toJson() => {

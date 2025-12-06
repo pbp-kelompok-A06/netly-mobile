@@ -23,7 +23,7 @@ class _EventPageState extends State<EventPage> {
   bool _isAscending = false;
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/event/show-even');
+    final response = await request.get('http://localhost:8000/event/show_events_flutter');
 
     // convert Json dari django ke List<EventEntry>
     var data = response;
@@ -121,7 +121,6 @@ class _EventPageState extends State<EventPage> {
                     onTap: () {
                       setState(() {
                         _isAscending = true; 
-                        // HAPUS _sortEvents();
                       });
                     },
                     child: AnimatedContainer(

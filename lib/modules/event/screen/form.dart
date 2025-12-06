@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class EventFormPage extends StatefulWidget {
   const EventFormPage({super.key});
@@ -55,6 +59,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return AlertDialog(
       title: const Center(
         child: Text(
@@ -216,13 +221,34 @@ class _EventFormPageState extends State<EventFormPage> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20),
           ),
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState!.validate()) {
-              // TODO: save ke database
-              Navigator.pop(context); 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Event created successfully!"))
+              // kirim data ke django -> endpoint: /event/create-flutter/
+              final response = await request.postJson(
+                "http://localhost:8000/event/create-flutter/",
+                jsonEncode({
+                  "name": _name,
+                  "description": _description,
+                  "location": _location,
+                  "start_date": _startDateController.text, // format YYYY-MM-DD
+                  "end_date": _endDateController.text,
+                  "max_participants": _maxParticipants,
+                  "image_url": _imageUrl,
+                }),
               );
+
+            if (context.mounted) {
+                if (response['status'] == 'success') {
+                  Navigator.pop(context); // close modal
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Event created successfully!")),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Error: ${response['message']}")),
+                  );
+                }
+              }
             }
           },
           child: const Text("Save", style: TextStyle(color: Colors.white)),
