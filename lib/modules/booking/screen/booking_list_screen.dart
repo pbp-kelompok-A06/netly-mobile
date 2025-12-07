@@ -1,16 +1,12 @@
-
-
 import 'package:flutter/material.dart';
-// Asumsi: File ini sekarang mengekspor class 'Booking' alih-alih 'BookingModel'
-// dan field di dalamnya konsisten dengan yang dibutuhkan (lapangan, totalPrice, statusBook, createdAt, id).
 import 'package:netly_mobile/modules/booking/model/booking_model.dart';
-import 'package:netly_mobile/modules/booking/route/booking_route.dart';
 import 'package:netly_mobile/modules/booking/screen/booking_detail_screen.dart';
-import 'package:netly_mobile/modules/booking/services/booking_services.dart'; // Import BookingService yang Anda sediakan
-import 'package:netly_mobile/utils/path_web.dart';
+import 'package:netly_mobile/modules/booking/services/booking_services.dart';
+import 'package:netly_mobile/utils/path_web.dart'; // Diperlukan untuk BookingService
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:netly_mobile/modules/booking/screen/admin_booking_detail_screen.dart';
 
 class BookingListPage extends StatefulWidget {
   const BookingListPage({super.key});
@@ -20,30 +16,60 @@ class BookingListPage extends StatefulWidget {
 }
 
 class _BookingListPageState extends State<BookingListPage> {
-  // Disesuaikan untuk menggunakan class Booking (sesuai BookingService Anda)
+  // State untuk data booking
   late Future<List<Booking>> _futureBookings;
+
+  // State baru untuk status Admin
+  bool _isAdmin = false;
+  bool _isAdminChecked = false; // Untuk melacak apakah cek admin sudah selesai
 
   @override
   void initState() {
     super.initState();
-    // Memanggil _fetchBookings saat widget dibuat
+    // Mulai pengecekan status Admin
+    _checkAdminStatus();
+    // Mulai fetching data booking
     _futureBookings = _fetchBookings();
   }
 
-  // Fungsi untuk memuat data menggunakan BookingService
-  // Disesuaikan untuk menggunakan class Booking (sesuai BookingService Anda)
+  // Fungsi baru untuk memuat status admin
+  Future<void> _checkAdminStatus() async {
+    final request = context.read<CookieRequest>();
+    final service = BookingService(request: request);
+
+    try {
+      final adminInfo = await service.getAdminInfo(request);
+
+      if (mounted) {
+        setState(() {
+          _isAdmin = adminInfo['is_admin'] == true;
+          _isAdminChecked = true; // Status admin sudah diketahui
+        });
+        print('Admin Status Check Complete: isAdmin=$_isAdmin');
+      }
+    } catch (e) {
+      print('Failed to check admin status: $e');
+      if (mounted) {
+        // Asumsikan non-admin jika gagal, tapi tetap tandai sudah selesai dicek
+        setState(() {
+          _isAdmin = false;
+          _isAdminChecked = true;
+        });
+      }
+    }
+  }
+
+  // Fungsi untuk memuat data booking
   Future<List<Booking>> _fetchBookings() async {
     final request = context.read<CookieRequest>();
     final service = BookingService(request: request);
 
     try {
-      // Menggunakan fetchBookings dari Service yang mengembalikan List<Booking>
       return await service.fetchAllBookings(request);
     } catch (e) {
       print('Failed to load bookings via Service: $e');
 
       if (context.mounted) {
-        // Pesan error diambil dari Exception yang dilempar oleh service
         _showErrorDialog(
           context,
           'Gagal memuat riwayat booking: ${e.toString().replaceFirst('Exception: ', '')}. Pastikan Anda sudah login.',
@@ -74,18 +100,52 @@ class _BookingListPageState extends State<BookingListPage> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
-        return Colors.green;
+        return Colors.green.shade700;
       case 'failed':
-        return Colors.grey;
+        return Colors.red.shade700;
       case 'pending':
-        return Colors.red;
+        return Colors.orange.shade700;
       default:
-        return Colors.blue;
+        return Colors.blue.shade700;
+    }
+  }
+
+  Color _getStatusBackgroundColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green.shade100;
+      case 'failed':
+        return Colors.red.shade100;
+      case 'pending':
+        return Colors.orange.shade100;
+      default:
+        return Colors.blue.shade100;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Tampilkan loading jika status admin belum diketahui
+    if (!_isAdminChecked) {
+      return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: AppBar(
+            title: Text(
+              'My Bookings',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Color(0xFF243153),
+            foregroundColor: Colors.white,
+          ),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFFD7FC64)),
+        ),
+      );
+    }
+
+    // Setelah status admin diketahui, tampilkan FutureBuilder untuk data booking
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -95,16 +155,14 @@ class _BookingListPageState extends State<BookingListPage> {
         backgroundColor: const Color(0xFF243153), // primary-dark
         foregroundColor: Colors.white,
       ),
-      // Disesuaikan untuk menggunakan class Booking (sesuai BookingService Anda)
       body: FutureBuilder<List<Booking>>(
         future: _futureBookings,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(color: Color(0xFFD7FC64)),
-            ); // accent-lime
+            );
           } else if (snapshot.hasError) {
-            // Jika ada error (termasuk error autentikasi atau network)
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -126,8 +184,7 @@ class _BookingListPageState extends State<BookingListPage> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _futureBookings =
-                              _fetchBookings(); // Coba fetch ulang
+                          _futureBookings = _fetchBookings(); // Coba fetch ulang
                         });
                       },
                       child: const Text('Coba Lagi'),
@@ -152,7 +209,6 @@ class _BookingListPageState extends State<BookingListPage> {
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
-                  // Opsional: tombol untuk ke halaman utama
                 ],
               ),
             );
@@ -160,53 +216,84 @@ class _BookingListPageState extends State<BookingListPage> {
             // Tampilkan daftar booking
             final bookings = snapshot.data!;
             return ListView.builder(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               itemCount: bookings.length,
               itemBuilder: (context, index) {
                 final booking = bookings[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16.0),
-                    // Asumsi: field lapangan ada di class Booking dan memiliki property name
-                    title: Text(
-                      booking.lapangan.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Color(0xFF243153),
+                
+                // Tentukan layar detail yang akan dinavigasi
+                final Widget detailScreen = _isAdmin
+                    ? BookingDetailAdminScreen(
+                        bookingId: booking.id,
+                      ) // Detail untuk Admin
+                    : BookingDetailScreen(
+                        bookingId: booking.id,
+                      ); // Detail untuk User Biasa
+                
+                return GestureDetector(
+                  onTap: () {
+                    // Logika navigasi menggunakan .then() untuk refresh data
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => detailScreen,
                       ),
+                    ).then((result) {
+                      // Refresh data saat kembali ke halaman ini
+                      setState(() {
+                        _futureBookings = _fetchBookings();
+                      });
+                      
+                      // Tampilkan SnackBar jika hasil kembali adalah true (berhasil dihapus dari detail admin screen)
+                      // Catatan: Ini hanya akan berfungsi jika Anda menghapus pushAndRemoveUntil di detail admin screen,
+                      // tapi karena kita menggunakan pushAndRemoveUntil di admin screen, SnackBar dihandle di sana.
+                      // Namun, kita tetap melakukan refresh data di sini.
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.15),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: _getStatusColor(booking.statusBook).withOpacity(0.5),
+                        width: 1.0,
+                      )
                     ),
-                    subtitle: Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          // Asumsi: field totalPrice ada di class Booking
-                          'Total Harga: Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(booking.totalPrice)}',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 4),
+                        // --- Bagian Atas: Lapangan dan Status ---
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Status: ',
-                              style: TextStyle(color: Colors.grey[600]),
+                            Flexible(
+                              child: Text(
+                                booking.lapangan.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Color(0xFF243153),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                                vertical: 2.0,
+                                horizontal: 10.0,
+                                vertical: 4.0,
                               ),
                               decoration: BoxDecoration(
-                                // Asumsi: field statusBook ada di class Booking
-                                color: _getStatusColor(
-                                  booking.statusBook,
-                                ).withOpacity(0.15),
+                                color: _getStatusBackgroundColor(booking.statusBook),
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
                               child: Text(
@@ -220,33 +307,67 @@ class _BookingListPageState extends State<BookingListPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          // Asumsi: field createdAt ada di class Booking
-                          'Dibuat pada: ${DateFormat('dd MMM yyyy, HH:mm').format(booking.createdAt)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                          ),
+                        const Divider(height: 20, thickness: 0.5),
+
+                        // --- Bagian Detail: Harga dan Waktu ---
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Total Harga',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(booking.totalPrice)}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Dibuat pada',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  DateFormat('dd MMM yyyy, HH:mm').format(booking.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[700],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
+                        
+                        // --- Tombol Detail ---
+                        const SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            'Lihat Detail >',
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        )
                       ],
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          
-                          builder: (context) => BookingDetailScreen(bookingId: booking.id),
-                              
-                        ),
-                      ).then((_) {
-                        // Refresh data saat kembali ke halaman ini
-                        setState(() {
-                          _futureBookings = _fetchBookings();
-                        });
-                      });
-                    },
                   ),
                 );
               },

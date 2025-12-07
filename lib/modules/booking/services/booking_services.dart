@@ -63,20 +63,18 @@ class BookingService {
     try {
       final response = await request.get('$pathWeb/booking/show_json/');
 
-        final List rawData = response as List;
+      final List rawData = response as List;
 
+      // Proses setiap item secara paralel (concurrent)
+      final List<Future<Booking>> futures = rawData.map((jsonItem) {
+        // PENTING: Meneruskan objek 'request' ke fromRawJson
+        return Booking.fromRawJson(jsonItem as Map<String, dynamic>, request);
+      }).toList();
 
-        // Proses setiap item secara paralel (concurrent)
-        final List<Future<Booking>> futures = rawData.map((jsonItem) {
-          // PENTING: Meneruskan objek 'request' ke fromRawJson
-          return Booking.fromRawJson(jsonItem as Map<String, dynamic>, request);
-        }).toList();
+      // Tunggu semua proses fetching detail selesai
+      final List<Booking> completedBookings = await Future.wait(futures);
 
-        // Tunggu semua proses fetching detail selesai
-        final List<Booking> completedBookings = await Future.wait(futures);
-
-        return completedBookings;
-      
+      return completedBookings;
     } catch (e) {
       if (kDebugMode) {
         print('Error di fetchAllBookings: $e');
@@ -93,24 +91,23 @@ class BookingService {
 
     final response = await request.get(url);
 
-    
-      final Map<String, dynamic> jsonData =
-          response as Map<String, dynamic>;
+    final Map<String, dynamic> jsonData = response as Map<String, dynamic>;
 
-      // PENTING: Meneruskan objek 'request' ke fromRawJson
-      final Booking booking = await Booking.fromRawJson(jsonData, request);
+    // PENTING: Meneruskan objek 'request' ke fromRawJson
+    final Booking booking = await Booking.fromRawJson(jsonData, request);
 
-      return booking;
-
+    return booking;
   }
 
   Future<Map<String, dynamic>> createBooking(
     String lapanganId,
     List<String> jadwalIds,
   ) async {
-    print(  "Creating booking for Lapangan ID: $lapanganId with Jadwal IDs: $jadwalIds");
+    print(
+      "Creating booking for Lapangan ID: $lapanganId with Jadwal IDs: $jadwalIds",
+    );
     final url = '$pathWeb/booking/create_booking_flutter/';
-    
+
     final Map<String, dynamic> body = {
       'lapangan_id': lapanganId,
 
@@ -120,7 +117,6 @@ class BookingService {
     final response = await request.postJson(url, jsonEncode(body));
     print("response from createBooking: $response");
     if (response is Map) {
-      
       final Map<String, dynamic> data = response as Map<String, dynamic>;
       if (data['success'] == true) {
         return {
@@ -140,7 +136,7 @@ class BookingService {
     final url = '$pathWeb/booking/booking_detail/$bookingId/complete/';
 
     final response = await request.postJson(url, jsonEncode({}));
-  print("RESPONSE: $response");
+    print("RESPONSE: $response");
 
     if (response is Map) {
       final Map<String, dynamic> data = response as Map<String, dynamic>;
@@ -156,5 +152,49 @@ class BookingService {
         'Gagal mengonfirmasi pembayaran. Format respon tidak valid.',
       );
     }
+  }
+
+  Future<bool> checkAdmin(CookieRequest request) async {
+    // Ganti dengan URL backend kamu
+    const String url = "$pathWeb/booking/check_admin/";
+
+    final response = await request.get(url);
+    return response['is_admin'] as bool;
+  }
+
+  Future<Map<dynamic, dynamic>> deleteBookingAsAdmin(String bookingId) async {
+    final url =
+        '$pathWeb/booking/delete_booking/$bookingId/'; // Sesuaikan dengan URL Django Anda
+    
+    print("Deleting booking with ID: $bookingId");
+    // Melakukan POST request
+    final response = await request.postJson(
+      url,
+      jsonEncode({}), // POST body kosong karena booking_id ada di URL
+    );
+    print(  "DELETE BOOKING RESPONSE: $response");
+    // Cek apakah respons memiliki kunci 'success'
+    // return JsonResponse({'success': False, 'message': 'Booking tidak ditemukan.'}, status=404)
+    if (response is Map && response['success'] == true) {
+      return response; // Berhasil
+    } else {
+      // Melempar Exception jika operasi tidak berhasil
+      String message =
+          response['message'] ??
+          'Gagal menghapus booking. Respon server tidak valid.';
+      throw Exception(message);
+    }
+  }
+
+  Future<Map<String, dynamic>> getAdminInfo(CookieRequest request) async {
+    const String url = "$pathWeb/booking/check_admin/";
+
+    final response = await request.get(url);
+
+    return {
+      'is_admin': response['is_admin'] ?? false,
+      'username': response['username'] ?? '',
+      'role': response['role'] ?? '',
+    };
   }
 }
