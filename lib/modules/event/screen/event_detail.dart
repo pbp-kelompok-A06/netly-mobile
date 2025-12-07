@@ -244,7 +244,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
                         if (context.mounted) {
                           if (response['status'] == 'success') {
-                            // 3. Update UI berdasarkan respon server
+                            // update UI berdasarkan respon server
                             setState(() {
                               if (response['action'] == 'join') {
                                 isJoined = true;

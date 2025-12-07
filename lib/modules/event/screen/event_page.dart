@@ -152,12 +152,12 @@ class _EventPageState extends State<EventPage> {
             child: FutureBuilder(
               future: fetchEvents(request), // panggil fungsi fetch
               builder: (context, AsyncSnapshot snapshot) {
-                // 1. KONDISI LOADING
+                // loading
                 if (snapshot.data == null && snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } 
                 
-                // 2. KONDISI ERROR (PENTING BIAR KETAWAN ERRORNYA APA)
+                // error handling
                 else if (snapshot.hasError) {
                    return Center(
                      child: Padding(
@@ -171,7 +171,7 @@ class _EventPageState extends State<EventPage> {
                    );
                 }
 
-                // 3. KONDISI DATA KOSONG / NULL
+                // data kosong
                 else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text(
@@ -181,7 +181,7 @@ class _EventPageState extends State<EventPage> {
                   );
                 } 
                 
-                // 4. KONDISI BERHASIL
+                // succcedded, tampilkan data
                 else {
                   return ListView.builder(
                     padding: const EdgeInsets.only(bottom: 80),
@@ -196,13 +196,18 @@ class _EventPageState extends State<EventPage> {
       ),
 
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showDialog(
+        onPressed: () async {
+          final result = await showDialog(
             context: context,
             builder: (BuildContext context) {
               return const EventFormPage();
             },
           );
+
+          // jika result true, maka refresh daftar event
+          if (result == true) {
+            setState(() {});    // akan fetch ulang data event
+          }
         },
         label: const Text('Add Event', style: TextStyle(fontWeight: FontWeight.bold)),
         icon: const Icon(Icons.add),

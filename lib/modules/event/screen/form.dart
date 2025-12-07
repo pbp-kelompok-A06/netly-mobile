@@ -239,7 +239,7 @@ class _EventFormPageState extends State<EventFormPage> {
 
             if (context.mounted) {
                 if (response['status'] == 'success') {
-                  Navigator.pop(context); // close modal
+                  Navigator.pop(context, true); // kembali ke halaman sebelumnya dan kirim true
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Event created successfully!")),
                   );

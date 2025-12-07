@@ -29,14 +29,34 @@ class EventCard extends StatelessWidget {
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               child: Image.network(
-                event.imageUrl,
+                event.imageUrl, 
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 150,
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                // show gambar default jika URL rusak/gagal load
                 errorBuilder: (context, error, stackTrace) => Container(
                   height: 150,
-                  color: Colors.grey[300],
-                  child: const Center(child: Icon(Icons.image_not_supported)),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/default.jpg'), 
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
             ),
