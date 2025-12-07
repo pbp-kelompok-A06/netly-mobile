@@ -21,6 +21,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final Color _whiteText = Colors.white;
   final Color _disabledGrey = Colors.grey;
 
+  // TODO: ganti isAdmin nanti pake data dari backend
+  final bool isAdmin = true;
   bool isJoined = false;
   late int currentParticipants; 
 
@@ -207,69 +209,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: _primaryBlue, 
+                color: Colors.white,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -7))],
               ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isButtonDisabled 
-                      ? _disabledGrey 
-                      : (isJoined ? _cancelBackground : _accentGreen),
-                  
-                  foregroundColor: isButtonDisabled 
-                      ? Colors.white 
-                      : (isJoined ? _whiteText : _primaryBlue),
-                  
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 0,
-                ),
-                onPressed: isButtonDisabled 
-                    ? null 
-                    : () async {
-                        // send request ke django ->  endpoint: /event/join-flutter/<uuid>/
-                        final response = await request.postJson(
-                          "http://localhost:8000/event/join-flutter/${widget.event.id}/",
-                          jsonEncode({}),
-                        );
-
-                        if (context.mounted) {
-                          if (response['status'] == 'success') {
-                            // update UI berdasarkan respon server
-                            setState(() {
-                              if (response['action'] == 'join') {
-                                isJoined = true;
-                                currentParticipants++;
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Join!"), backgroundColor: Colors.green));
-                              } else {
-                                isJoined = false;
-                                currentParticipants--;
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Leave!"), backgroundColor: Colors.red));
-                              }
-                            });
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(response['message'] ?? "Gagal")),
-                            );
-                          }
-                        }
-                      },
-                child: Text(
-                  isButtonDisabled 
-                      ? "Kuota Penuh" 
-                      : (isJoined ? "Leave Event" : "Join Event Now"),
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-              ),
+              child: isAdmin 
+                ? _buildAdminButtons()  // show button buat admin
+                : _buildUserButton(isButtonDisabled, request), // show button buat non-admin user
             ),
           ),
         ],
@@ -277,6 +223,130 @@ class _EventDetailPageState extends State<EventDetailPage> {
     );
   }
 
+  Widget _buildAdminButtons() {
+    return Column(
+      mainAxisSize: MainAxisSize.min, 
+      children: [
+        // edit button
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _primaryBlue,
+              foregroundColor: _accentGreen, // Teks Lime Green
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 0,
+            ),
+            onPressed: () {
+              // TODO: Arahkan ke halaman Edit Event
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Masuk ke mode Edit (Soon)")));
+            },
+            child: const Text("Edit Event", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          ),
+        ),
+        
+        const SizedBox(height: 12), 
+        
+        // delete button
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _cancelBackground,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 0,
+            ),
+            onPressed: () {
+              // TODO: Tampilkan Dialog Konfirmasi Delete
+              _showDeleteConfirmation(context);
+            },
+            child: const Text("Delete Event", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // dialog delete confirmation
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Event"),
+          content: const Text("Are you sure you want to delete this event? This action cannot be undone."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Tutup dialog
+                // TODO: Panggil API Delete ke Django di sini
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Event deleted (Mock)"), backgroundColor: Colors.red));
+                Navigator.pop(context); // Kembali ke halaman list event
+              },
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // button untuk user non admin -> join or leave event
+  Widget _buildUserButton(bool isButtonDisabled, CookieRequest request) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isButtonDisabled 
+              ? _disabledGrey 
+              : (isJoined ? _cancelBackground : _primaryBlue), // Join pakai Navy, Leave pakai Merah
+          foregroundColor: isButtonDisabled 
+              ? Colors.white 
+              : (isJoined ? _whiteText : _accentGreen), // Teks Join pakai Lime
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 0,
+        ),
+        onPressed: isButtonDisabled 
+            ? null 
+            : () async {
+                final response = await request.postJson(
+                  "http://localhost:8000/event/join-flutter/${widget.event.id}/",
+                  jsonEncode({}),
+                );
+                // ... logic handle response (sama seperti sebelumnya) ...
+                if (context.mounted) {
+                   if (response['status'] == 'success') {
+                      setState(() {
+                        if (response['action'] == 'join') {
+                          isJoined = true;
+                          currentParticipants++;
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Join!"), backgroundColor: Colors.green));
+                        } else {
+                          isJoined = false;
+                          currentParticipants--;
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Leave!"), backgroundColor: Colors.red));
+                        }
+                      });
+                   }
+                }
+              },
+        child: Text(
+          isButtonDisabled 
+              ? "Kuota Penuh" 
+              : (isJoined ? "Leave Event" : "Join Event Now"),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
   // helper widget untuk susun baris info icon + teks
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
