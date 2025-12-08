@@ -147,53 +147,59 @@ class _EventPageState extends State<EventPage> {
           
           const SizedBox(height: 16), 
 
-          // tampilin card event pakai FutureBuilder
-          Expanded(
-            child: FutureBuilder(
-              future: fetchEvents(request), // panggil fungsi fetch
-              builder: (context, AsyncSnapshot snapshot) {
-                // loading
-                if (snapshot.data == null && snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } 
-                
-                // error handling
-                else if (snapshot.hasError) {
-                   return Center(
-                     child: Padding(
-                       padding: const EdgeInsets.all(20.0),
-                       child: Text(
-                         "Error: ${snapshot.error}", 
-                         style: const TextStyle(color: Colors.red),
-                         textAlign: TextAlign.center,
+            // tampilin card event pakai FutureBuilder
+            Expanded(
+              child: FutureBuilder<List<EventEntry>>(
+                future: fetchEvents(request), // panggil fungsi fetch
+                builder: (context, AsyncSnapshot<List<EventEntry>> snapshot) {
+                  // loading
+                  if (snapshot.data == null && snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } 
+                  
+                  // error handling
+                  else if (snapshot.hasError) {
+                     return Center(
+                       child: Padding(
+                         padding: const EdgeInsets.all(20.0),
+                         child: Text(
+                           "Error: ${snapshot.error}", 
+                           style: const TextStyle(color: Colors.red),
+                           textAlign: TextAlign.center,
+                         ),
                        ),
-                     ),
-                   );
-                }
-
-                // data kosong
-                else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "Belum ada event.",
-                      style: TextStyle(color: Color(0xFF243153), fontSize: 20),
-                    ),
-                  );
-                } 
-                
-                // succcedded, tampilkan data
-                else {
-                  return ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (_, index) => EventCard(event: snapshot.data![index]),
-                  );
-                }
-              },
+                     );
+                  }
+  
+                  // data kosong
+                  else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "Belum ada event.",
+                        style: TextStyle(color: Color(0xFF243153), fontSize: 20),
+                      ),
+                    );
+                  } 
+                  
+                  // succcedded, tampilkan data
+                  else {
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 80),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (_, index) => EventCard(
+                        event: snapshot.data![index],
+                        onRefresh: () {
+                          // ini untuk0 membuat FutureBuilder menjalankan fetchEvents() lagi
+                          setState(() {});
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
+            ],
           ),
-        ],
-      ),
 
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {

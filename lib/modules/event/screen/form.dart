@@ -1,11 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:netly_mobile/modules/event/model/event_model.dart'; // Pastikan import model
 
 class EventFormPage extends StatefulWidget {
-  const EventFormPage({super.key});
+  final EventEntry? event; // Parameter opsional: Kalau ada isinya berarti mode EDIT
+
+  const EventFormPage({super.key, this.event});
 
   @override
   State<EventFormPage> createState() => _EventFormPageState();
@@ -20,38 +22,48 @@ class _EventFormPageState extends State<EventFormPage> {
   String _imageUrl = "";
   int _maxParticipants = 0;
 
-  // controller untuk field tanggal
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // set nilai awal tanggal ke hari ini
-    _startDateController.text = DateTime.now().toString().substring(0, 10); 
-    _endDateController.text = DateTime.now().toString().substring(0, 10);
+    
+    // cek mode, kalo edit -> widget.event tidak null
+    if (widget.event != null) {
+      // isi form dengan data lama
+      _name = widget.event!.name;
+      _description = widget.event!.description;
+      _location = widget.event!.location;
+      _imageUrl = widget.event!.imageUrl;
+      _maxParticipants = widget.event!.maxParticipants;
+
+      // format tanggal ke string YYYY-MM-DD
+      _startDateController.text = widget.event!.startDate.toString().substring(0, 10);
+      _endDateController.text = widget.event!.endDate.toString().substring(0, 10);
+    } else {
+      // kalau create -> isi tanggal hari ini
+      _startDateController.text = DateTime.now().toString().substring(0, 10); 
+      _endDateController.text = DateTime.now().toString().substring(0, 10);
+    }
   }
 
   @override
   void dispose() {
-    // bersihkan controller ketika halaman udah diclose
     _startDateController.dispose();
     _endDateController.dispose();
     super.dispose();
   }
 
-  // untuk menampilkan kalender
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(), // tanggal yang selected saat kalender buka
-      firstDate: DateTime(2000),   // batas awal tanggal
-      lastDate: DateTime(2101),    // batas akhir tanggal
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
-
     if (picked != null) {
       setState(() {
-        // format tanggal jadi YYYY-MM-DD (ambil 10 karakter pertama)
         controller.text = picked.toString().substring(0, 10);
       });
     }
@@ -60,23 +72,21 @@ class _EventFormPageState extends State<EventFormPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    
+    // judul form sesuai mode
+    final String title = widget.event != null ? "Edit Event" : "Create New Event";
+    final String buttonText = widget.event != null ? "Update" : "Save";
+
     return AlertDialog(
-      title: const Center(
+      title: Center(
         child: Text(
-          'Create New Event',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Color(0xFF243153),
-          ),
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF243153)),
         ),
       ),
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       scrollable: true,
-      
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.8,
         child: Form(
@@ -84,84 +94,71 @@ class _EventFormPageState extends State<EventFormPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-               // nama
+                // name
                 TextFormField(
+                  initialValue: _name, // pre-fill value
                   decoration: InputDecoration(
                     labelText: "Event Name",
-                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                   onChanged: (value) => setState(() => _name = value),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return "Name cannot be empty";
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? "Name cannot be empty" : null,
                 ),
                 const SizedBox(height: 12),
   
-                // lokasi
+                // location
                 TextFormField(
+                  initialValue: _location,
                   decoration: InputDecoration(
                     labelText: "Location",
-                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                   onChanged: (value) => setState(() => _location = value),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return "Location cannot be empty";
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? "Location cannot be empty" : null,
                 ),
                 const SizedBox(height: 12),
 
+                // Tanggal (Row)
                 Row(
                   children: [
-                    // start Date
                     Expanded(
                       child: TextFormField(
-                        controller: _startDateController, //connect ke controller
-                        readOnly: true, // readonly, ga bisa ketik atau muncul keyboard
+                        controller: _startDateController,
+                        readOnly: true,
                         decoration: InputDecoration(
                           labelText: "Start Date",
-                          labelStyle: const TextStyle(fontSize: 12),
                           prefixIcon: const Icon(Icons.calendar_today),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         ),
-                        // kalo diklik, panggil fungsi _selectDate
                         onTap: () => _selectDate(context, _startDateController),
                       ),
                     ),
+                   
                     const SizedBox(width: 8),
-                    // end Date
+
                     Expanded(
                       child: TextFormField(
                         controller: _endDateController,
-                        readOnly: true, 
+                        readOnly: true,
                         decoration: InputDecoration(
                           labelText: "End Date",
-                          labelStyle: const TextStyle(fontSize: 12),
                           prefixIcon: const Icon(Icons.calendar_today),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         ),
-                        // Saat diklik, panggil fungsi _selectDate
                         onTap: () => _selectDate(context, _endDateController),
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 12),
   
                 // max participants
                 TextFormField(
+                  initialValue: _maxParticipants > 0 ? _maxParticipants.toString() : "",
                   decoration: InputDecoration(
                     labelText: "Max Participants",
-                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => setState(() => _maxParticipants = int.tryParse(value) ?? 0),
@@ -173,13 +170,12 @@ class _EventFormPageState extends State<EventFormPage> {
                 ),
                 const SizedBox(height: 12),
   
-                // Image URL
+                // image URL
                 TextFormField(
+                  initialValue: _imageUrl,
                   decoration: InputDecoration(
                     labelText: "Image URL",
-                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                   onChanged: (value) => setState(() => _imageUrl = value),
                 ),
@@ -187,61 +183,59 @@ class _EventFormPageState extends State<EventFormPage> {
   
                 // Description
                 TextFormField(
+                  initialValue: _description,
                   maxLines: 3,
                   decoration: InputDecoration(
                     labelText: "Description",
-                    labelStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                   onChanged: (value) => setState(() => _description = value),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return "Description cannot be empty";
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? "Description cannot be empty" : null,
                 ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
           child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
         ),
-        
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF243153),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           ),
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
-              // kirim data ke django -> endpoint: /event/create-flutter/
+              // untuk tentukan endpoint antara edit atau create
+              String url;
+              if (widget.event != null) {
+                // endpoint edit
+                url = "http://localhost:8000/event/edit-flutter/${widget.event!.id}/";
+              } else {
+                // endpoint create
+                url = "http://localhost:8000/event/create-flutter/";
+              }
+
               final response = await request.postJson(
-                "http://localhost:8000/event/create-flutter/",
+                url,
                 jsonEncode({
                   "name": _name,
                   "description": _description,
                   "location": _location,
-                  "start_date": _startDateController.text, // format YYYY-MM-DD
+                  "start_date": _startDateController.text,
                   "end_date": _endDateController.text,
                   "max_participants": _maxParticipants,
                   "image_url": _imageUrl,
                 }),
               );
 
-            if (context.mounted) {
+              if (context.mounted) {
                 if (response['status'] == 'success') {
-                  Navigator.pop(context, true); // kembali ke halaman sebelumnya dan kirim true
+                  Navigator.pop(context, true); // send sinyal 'true' agar halaman sebelumnya refresh
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Event created successfully!")),
+                    SnackBar(content: Text(response['message'] ?? "Success!")),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -251,10 +245,9 @@ class _EventFormPageState extends State<EventFormPage> {
               }
             }
           },
-          child: const Text("Save", style: TextStyle(color: Colors.white)),
+          child: Text(buttonText, style: const TextStyle(color: Colors.white)),
         ),
       ],
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     );
   }
 }

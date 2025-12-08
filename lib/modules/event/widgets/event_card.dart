@@ -4,8 +4,9 @@ import '../model/event_model.dart';
 
 class EventCard extends StatelessWidget {
   final EventEntry event;
-  
-  const EventCard({super.key, required this.event});
+  final VoidCallback? onRefresh;
+
+  const EventCard({super.key, required this.event, this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +15,19 @@ class EventCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => EventDetailPage(event: event),
             ),
           );
+          if (result == true) {
+            // refresh pake fungsi dari parentny
+            if (onRefresh != null) {
+              onRefresh!(); 
+            }
+          }
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

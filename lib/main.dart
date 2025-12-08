@@ -27,9 +27,8 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Poppins',
           useMaterial3: true,
         ),
-        // initialRoute: AuthRoutes.login,
-        // routes: AppRoutes.routes,
-        home: const EventPage(),
+        initialRoute: AuthRoutes.login,
+        routes: AppRoutes.routes,
       ),
     );
   }

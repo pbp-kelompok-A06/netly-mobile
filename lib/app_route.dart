@@ -5,7 +5,6 @@ import 'package:netly_mobile/modules/event/route/event_route.dart';
 
 
 class AppRoutes {
-
   static final Map<String, WidgetBuilder> routes = {
     ...AuthRoutes.routes,
     ...CommunityRoutes.routes,

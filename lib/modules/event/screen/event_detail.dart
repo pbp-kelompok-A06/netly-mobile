@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/event/model/event_model.dart';
+import 'package:netly_mobile/modules/event/screen/form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -238,9 +239,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               elevation: 0,
             ),
-            onPressed: () {
-              // TODO: Arahkan ke halaman Edit Event
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Masuk ke mode Edit (Soon)")));
+            onPressed: () async {
+              // pakai form tapi mode edit
+              final result = await showDialog(
+                context: context,
+                builder: (context) => EventFormPage(event: widget.event),
+              );
+
+              // kalau update berhasil, refresh halaman supaya automatically update datanya
+              if (result == true) {
+                if (context.mounted) {
+                   Navigator.pop(context, true); 
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Event updated!")));
+                }
+              }
             },
             child: const Text("Edit Event", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           ),
@@ -272,6 +284,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   // dialog delete confirmation
   void _showDeleteConfirmation(BuildContext context) {
+    final request = context.read<CookieRequest>();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -280,15 +293,29 @@ class _EventDetailPageState extends State<EventDetailPage> {
           content: const Text("Are you sure you want to delete this event? This action cannot be undone."),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Tutup dialog
-                // TODO: Panggil API Delete ke Django di sini
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Event deleted (Mock)"), backgroundColor: Colors.red));
-                Navigator.pop(context); // Kembali ke halaman list event
+              onPressed: () async {
+                // close dialog konfirmasi
+                Navigator.pop(context); 
+                
+                // use delete_event_ajax
+                final response = await request.postJson(
+                  "http://localhost:8000/event/ajax/delete/${widget.event.id}/", 
+                  jsonEncode({}),
+                );
+
+                if (context.mounted) {
+                  if (response['status'] == 'success') {
+                    // kembali ke halaman list event dan kirim sinyal refresh
+                    Navigator.pop(context, true); 
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Event deleted successfully"), backgroundColor: Colors.red),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(response['message'] ?? "Failed to delete")),
+                    );
+                  }
+                }
               },
               child: const Text("Delete", style: TextStyle(color: Colors.red)),
             ),
@@ -306,10 +333,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: isButtonDisabled 
               ? _disabledGrey 
-              : (isJoined ? _cancelBackground : _primaryBlue), // Join pakai Navy, Leave pakai Merah
+              : (isJoined ? _cancelBackground : _primaryBlue), 
           foregroundColor: isButtonDisabled 
               ? Colors.white 
-              : (isJoined ? _whiteText : _accentGreen), // Teks Join pakai Lime
+              : (isJoined ? _whiteText : _accentGreen), 
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 0,
