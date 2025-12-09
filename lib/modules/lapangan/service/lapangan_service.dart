@@ -8,7 +8,7 @@ class LapanganService {
   LapanganService(this.request);
 
   // Get base URL
-  String get baseUrl => pathWeb['localhost']!;
+  String get baseUrl => pathWeb;
 
   // Fetch all lapangan
   Future<LapanganModel?> fetchAllLapangan({

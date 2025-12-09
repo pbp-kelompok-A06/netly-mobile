@@ -7,7 +7,7 @@ class JadwalService {
 
   JadwalService(this.request);
 
-  String get baseUrl => pathWeb['localhost']!;
+  String get baseUrl => pathWeb;
 
   // Fetch all jadwal for a specific lapangan
   Future<JadwalLapanganModel?> fetchJadwalByLapangan({
