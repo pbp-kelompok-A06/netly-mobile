@@ -1,0 +1,232 @@
+import 'package:flutter/material.dart';
+import 'package:netly_mobile/utils/path_web.dart';
+import 'package:provider/provider.dart';
+
+import 'package:netly_mobile/modules/event/model/event_model.dart';
+import 'package:netly_mobile/modules/event/widgets/event_card.dart';
+import 'package:netly_mobile/modules/event/screen/form.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+
+class EventPage extends StatefulWidget {
+  const EventPage({super.key});
+
+  @override
+  State<EventPage> createState() => _EventPageState();
+}
+
+class _EventPageState extends State<EventPage> {
+  final Color _primaryBlue = const Color(0xFF243153);
+  final Color _accentGreen = const Color(0xFFD7FC64); 
+  final Color _inactiveTrack = const Color(0xFFE0E0E0); 
+  final Color _inactiveText = const Color(0xFF757575);  // abu abu text kalau button inactive
+
+  // sorting: true = ascending (terlama -> terbaru), false = descending
+  bool _isAscending = false;
+
+  Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
+    String url = '$pathWeb/event/show-events-flutter/';
+
+    final response = await request.get(url);
+
+    // convert Json dari django ke List<EventEntry>
+    var data = response;
+    List<EventEntry> listEvents = [];
+    for (var things in data) {
+      if ( things != null) {
+        listEvents.add(EventEntry.fromJson(things));
+      }
+    }
+
+    // logic untuk sorting
+    if (_isAscending) {
+      listEvents.sort((a, b) => a.startDate.compareTo(b.startDate));
+    } else {
+      listEvents.sort((b, a) => a.startDate.compareTo(b.startDate));
+    }
+
+    return listEvents;
+  }
+
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>(); // akses request
+
+    // role checking
+    String role = request.jsonData['userData']?['role'] ?? "user"; 
+    bool isAdmin = role == 'admin';
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('All Events', style: TextStyle(
+          fontWeight: FontWeight.bold,
+        )),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF243153),
+        elevation: 0,
+        surfaceTintColor: Colors.white,
+      ),
+
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          
+          // section untuk filter
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 0.0, bottom: 5.0),
+            child: Text(
+              "Sort Date",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: _primaryBlue,
+              ),
+            ),
+          ),
+
+          // untuk toggle button filter
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(4.0), 
+            height: 50,
+            decoration: BoxDecoration(
+              color: _inactiveTrack, 
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Row(
+              children: [
+                // button kiri untuk descending (latest ke earliest)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isAscending = false; 
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200), // efek animasi smooth
+                      decoration: BoxDecoration(
+                        color: !_isAscending ? _primaryBlue : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Latest \u2192 Earliest", 
+                        style: TextStyle(
+                          // set warna text antara dia active dan ga active
+                          color: !_isAscending ? _accentGreen : _inactiveText,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // button kanan untuk earliest ke latest
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isAscending = true; 
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: _isAscending ? _primaryBlue : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Earliest \u2192 Latest",
+                        style: TextStyle(
+                          color: _isAscending ? _accentGreen : _inactiveText,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16), 
+
+            // tampilin card event pakai FutureBuilder
+            Expanded(
+              child: FutureBuilder<List<EventEntry>>(
+                future: fetchEvents(request), // panggil fungsi fetch
+                builder: (context, AsyncSnapshot<List<EventEntry>> snapshot) {
+                  // loading
+                  if (snapshot.data == null && snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } 
+                  
+                  // error handling
+                  else if (snapshot.hasError) {
+                     return Center(
+                       child: Padding(
+                         padding: const EdgeInsets.all(20.0),
+                         child: Text(
+                           "Error: ${snapshot.error}", 
+                           style: const TextStyle(color: Colors.red),
+                           textAlign: TextAlign.center,
+                         ),
+                       ),
+                     );
+                  }
+  
+                  // data kosong
+                  else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "Belum ada event.",
+                        style: TextStyle(color: Color(0xFF243153), fontSize: 20),
+                      ),
+                    );
+                  } 
+                  
+                  // succcedded, tampilkan data
+                  else {
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 80),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (_, index) => EventCard(
+                        event: snapshot.data![index],
+                        onRefresh: () {
+                          // ini untuk membuat FutureBuilder menjalankan fetchEvents() lagi
+                          setState(() {});
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            ],
+          ),
+
+      floatingActionButton: isAdmin 
+        ? FloatingActionButton.extended(
+            onPressed: () async {
+              final result = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const EventFormPage();
+                },
+              );
+              if (result == true) {
+                setState(() {});
+              }
+            },
+            label: const Text('Add Event', style: TextStyle(fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.add),
+            backgroundColor: _primaryBlue,
+            foregroundColor: _accentGreen,
+          )
+        : null, // tombol hilang untuk user biasa (non admin)
+    );
+  }
+}

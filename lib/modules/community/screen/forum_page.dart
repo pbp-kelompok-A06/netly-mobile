@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
+import 'package:netly_mobile/modules/booking/route/booking_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -64,25 +65,58 @@ class ForumPage extends StatelessWidget {
 
           ElevatedButton(
             onPressed: () async {
-              
-
-              final response = await request.logout(
-                "${pathWeb['netly']}/logout-ajax/"
-              );
-              if (response['status'] == 'success'){
-                if (context.mounted){
-                  Navigator.pushReplacement(
-                    context, 
-                    MaterialPageRoute(builder: AuthRoutes.routes[AuthRoutes.login]!)
+              final response = await request.logout("$pathWeb/logout-ajax/");
+              if (response['status'] == 'success') {
+                if (context.mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: AuthRoutes.routes[AuthRoutes.login]!,
+                    ),
                   );
                 }
-
               }
-
             },
 
             child: Text("Logout"),
           ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: BookingRoutes.routes[BookingRoutes.tes2]!,
+                ),
+              );
+            },
+
+            child: Text("Booking"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: BookingRoutes.routes[BookingRoutes.tes3]!,
+                ),
+              );
+            },
+
+            child: Text("Booking List"),
+          ),
+                    ElevatedButton(
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: BookingRoutes.routes[BookingRoutes.tes4]!,
+                ),
+              );
+            },
+
+            child: Text("Booking create"),
+          ),
+          
         ],
       ),
     );
