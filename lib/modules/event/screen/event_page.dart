@@ -25,13 +25,7 @@ class _EventPageState extends State<EventPage> {
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
     String url = 'http://localhost:8000/event/show-events-flutter/';
 
-    print("🚀 [DEBUG] Fetching events from: $url");
-    print("🍪 [DEBUG] Status Login saat fetch: ${request.loggedIn}");
-
     final response = await request.get(url);
-    
-    print("📥 [DEBUG] Response Mentah dari Server:");
-    print(response);
 
     // convert Json dari django ke List<EventEntry>
     var data = response;
@@ -77,7 +71,7 @@ class _EventPageState extends State<EventPage> {
           
           // section untuk filter
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 16.0, bottom: 8.0),
+            padding: const EdgeInsets.only(left: 16.0, top: 0.0, bottom: 5.0),
             child: Text(
               "Sort Date",
               style: TextStyle(

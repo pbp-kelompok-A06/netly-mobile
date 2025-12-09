@@ -24,6 +24,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   bool isJoined = false;
   late int currentParticipants; 
+  bool hasChanged = false;
 
   @override
   void initState() {
@@ -40,6 +41,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
     // role checking
     String role = request.jsonData['userData']?['role'] ?? "user";
     bool isAdmin = role == 'admin';
+
+    double contentBottomPadding = isAdmin ? 180.0 : 100.0;
 
     // ambil tinggi layar
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -117,7 +120,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   top: 50,
                   left: 20,
                   child: InkWell(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.pop(context, hasChanged),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -137,7 +140,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             top: screenHeight * 0.25,
             left: 20,
             right: 20,
-            bottom: 100, // sisakan space untuk tombol
+            bottom: contentBottomPadding,
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -259,7 +262,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryBlue,
-              foregroundColor: _accentGreen, // Teks Lime Green
+              foregroundColor: _accentGreen, 
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               elevation: 0,
@@ -375,6 +378,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 if (context.mounted) {
                    if (response['status'] == 'success') {
                       setState(() {
+                        hasChanged = true;
                         if (response['action'] == 'join') {
                           isJoined = true;
                           currentParticipants++;
