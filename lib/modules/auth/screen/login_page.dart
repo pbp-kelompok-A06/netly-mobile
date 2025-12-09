@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:netly_mobile/modules/homepage/route/homepage_route.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
-import 'package:netly_mobile/modules/community/route/community_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:netly_mobile/main_page.dart';
 
@@ -132,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MainPage(), 
+                                  builder: (context) => const MainPage(),
                                 ),
                               );
                             }

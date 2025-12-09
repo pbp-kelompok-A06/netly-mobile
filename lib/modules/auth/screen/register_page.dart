@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:netly_mobile/modules/homepage/route/homepage_route.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
-import 'package:netly_mobile/modules/community/route/community_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:netly_mobile/main_page.dart';
 
@@ -18,10 +16,12 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _profilePictureController = TextEditingController();
+  final TextEditingController _profilePictureController =
+      TextEditingController();
 
   bool _passwordShown = false;
   bool _confirmPasswordShown = false;
@@ -34,9 +34,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: 
-      Padding(
-        padding: const EdgeInsets.all( 24.0),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,10 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
               // GREETINGS MESSAGE
               const Text(
                 "Create Account",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 8),
@@ -112,7 +108,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      
                     ),
 
                     const SizedBox(height: 18),
@@ -127,16 +122,17 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (String? value) {
-                        if(value != null && value.isNotEmpty ){
+                        if (value != null && value.isNotEmpty) {
                           final uriCheck = Uri.tryParse(value);
-                          if(uriCheck == null || !uriCheck.hasScheme || !uriCheck.hasAuthority){
+                          if (uriCheck == null ||
+                              !uriCheck.hasScheme ||
+                              !uriCheck.hasAuthority) {
                             return "Profile picture harus dalam link url";
                           }
                         }
 
                         return null;
                       },
-                      
                     ),
 
                     const SizedBox(height: 18),
@@ -153,7 +149,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         // ICON SHOW / HIDE PASSWORD
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _passwordShown? Icons.visibility: Icons.visibility_off,
+                            _passwordShown
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -163,21 +161,18 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) {
-                        if(value == null || value.isEmpty){
+                        if (value == null || value.isEmpty) {
                           return "Password must be filled!";
                         }
 
-                        if (value != _confirmPasswordController.text){
+                        if (value != _confirmPasswordController.text) {
                           return "Password and Confirm Password are not matched!";
                         }
                         return null;
-
                       },
                     ),
 
-
                     const SizedBox(height: 16),
-
 
                     // CONFIRM PASSWORD
                     TextFormField(
@@ -191,7 +186,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         // ICON SHOW / HIDE PASSWORD
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _confirmPasswordShown? Icons.visibility: Icons.visibility_off,
+                            _confirmPasswordShown
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -201,87 +198,74 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       validator: (value) {
-                        if(value == null || value.isEmpty){
+                        if (value == null || value.isEmpty) {
                           return "Confirm Password must be filled!";
                         }
 
-                        if (value != _passwordController.text){
+                        if (value != _passwordController.text) {
                           return "Password and Confirm Password are not matched!";
                         }
                         return null;
-
                       },
                     ),
-
 
                     const SizedBox(height: 16),
 
                     SizedBox(
                       width: double.infinity,
                       height: 48,
-                      child: 
-                        ElevatedButton(
-                          onPressed: () async {
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
 
-                            if (!_formKey.currentState!.validate()){
-                              return ;
-                            }
-
-
-                            final response = await request.login(
-                              "$pathWeb/register-ajax/",
-                              jsonEncode({
-                                'username': _usernameController.text,
-                                'password1': _passwordController.text,
-                                'password2': _confirmPasswordController.text,
-                                'full_name': _fullNameController.text,
-                                'location': _locationController.text,
-                                'profile_picture': _profilePictureController.text
-
-                                
-                              }),
-                            );
-                            if (request.loggedIn){
-                              request.jsonData['userData'] = response['data'];
+                          final response = await request.login(
+                            "$pathWeb/register-ajax/",
+                            jsonEncode({
+                              'username': _usernameController.text,
+                              'password1': _passwordController.text,
+                              'password2': _confirmPasswordController.text,
+                              'full_name': _fullNameController.text,
+                              'location': _locationController.text,
+                              'profile_picture': _profilePictureController.text,
+                            }),
+                          );
+                          if (request.loggedIn) {
+                            request.jsonData['userData'] = response['data'];
 
                             if (context.mounted) {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const MainPage(), 
+                                  builder: (context) => const MainPage(),
                                 ),
                               );
                             }
-
-                            }else{
-                              if (context.mounted){
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Register Failed'),
-                                    content: Text(response['message']),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text('OK'),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
+                          } else {
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Register Failed'),
+                                  content: Text(response['message']),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text('OK'),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
                             }
+                          }
+                        },
 
-                          },
-
-                          child: Text("Register"),
-                      )
+                        child: Text("Register"),
+                      ),
                     ),
-
-                  
-
-                    
 
                     const SizedBox(height: 50),
 
@@ -305,7 +289,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 color: Colors.blue,
                                 fontWeight: FontWeight.bold,
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -318,7 +302,6 @@ class _RegisterPageState extends State<RegisterPage> {
             ],
           ),
         ),
-        
       ),
     );
   }
