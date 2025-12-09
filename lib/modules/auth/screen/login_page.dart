@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
-import 'package:netly_mobile/modules/community/route/community_route.dart';
+import 'package:netly_mobile/modules/event/route/event_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 
 class LoginPage extends StatefulWidget {
@@ -133,8 +133,8 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: CommunityRoutes
-                                      .routes[CommunityRoutes.tes]!,
+                                  builder: EventRoutes
+                                      .routes[EventRoutes.eventPage]!,
                                 ),
                               );
                             }
@@ -165,10 +165,6 @@ class _LoginPageState extends State<LoginPage> {
                         child: const Text("Login"),
                       ),
                     ),
-
-                  
-
-                    
 
                     const SizedBox(height: 50),
 

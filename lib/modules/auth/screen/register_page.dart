@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/event/route/event_route.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/modules/auth/route/auth_route.dart';
-import 'package:netly_mobile/modules/community/route/community_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -245,7 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               if (context.mounted){
                                 Navigator.pushReplacement(
                                   context, 
-                                  MaterialPageRoute(builder: CommunityRoutes.routes[CommunityRoutes.tes]!)
+                                  MaterialPageRoute(builder: EventRoutes.routes[EventRoutes.eventPage]!)
                                 );
                               }
 
