@@ -57,7 +57,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
           ],
         ),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? Colors.red.shade400 : const Color(0xFF243153), 
+        backgroundColor: isError ? Colors.red.shade400 : const Color(0xFF243153),
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
@@ -130,13 +130,13 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
 
       if (response['status'] == 'added') {
         setState(() => isFavorited = true);
-        _showCustomSnackBar("Saved to Favorites"); 
+        _showCustomSnackBar("Saved to Favorites");
       } else if (response['status'] == 'removed') {
         setState(() => isFavorited = false);
-        _showCustomSnackBar("Removed from Favorites"); 
+        _showCustomSnackBar("Removed from Favorites");
       }
     } catch (e) {
-      _showCustomSnackBar("Login required", isError: true); 
+      _showCustomSnackBar("Login required", isError: true);
     } finally {
       setState(() => isLoading = false);
     }
@@ -157,7 +157,6 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
       
       _showCustomSnackBar("Label updated to ${_getDisplayLabel(newLabel)}");
     } catch (e) {
-      // Silent error
     }
   }
 
@@ -236,6 +235,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
+                            color: Colors.white, 
                             border: Border.all(color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(50),
                           ),
@@ -260,6 +260,9 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                                 child: DropdownButton<String>(
                                   value: selectedLabel,
                                   isDense: true,
+                                  dropdownColor: Colors.white, 
+                                  borderRadius: BorderRadius.circular(12),
+                                  
                                   icon: const Icon(Icons.keyboard_arrow_down, size: 18),
                                   style: const TextStyle(color: Color(0xFF243153), fontWeight: FontWeight.bold),
                                   items: favoriteLabels.map((String value) {
@@ -299,14 +302,16 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text("START FROM", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-                    Text("Rp ${widget.court.formattedPrice}", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF243153))),
-                  ],
+                Text(
+                  "Rp ${widget.court.formattedPrice}",
+                  style: const TextStyle(
+                    fontSize: 22, 
+                    fontWeight: FontWeight.w800, 
+                    color: Color(0xFF243153)
+                  ),
                 ),
+                
+                // Tombol Book
                 ElevatedButton(
                   onPressed: () {}, 
                   style: ElevatedButton.styleFrom(
