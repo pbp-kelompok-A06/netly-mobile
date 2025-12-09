@@ -288,9 +288,9 @@ class _LapanganListPageState extends State<LapanganListPage> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 1.3,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.8,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
                         ),
                     itemCount: lapanganList.length,
                     itemBuilder: (context, index) {
@@ -311,14 +311,17 @@ class _LapanganListPageState extends State<LapanganListPage> {
         ],
       ),
       floatingActionButton: isAdmin
-          ? FloatingActionButton.extended(
-              onPressed: _addLapangan,
-              backgroundColor: const Color(0xFFD7FC64),
-              foregroundColor: const Color(0xFF243153),
-              icon: const Icon(Icons.add),
-              label: const Text('Add'),
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 80.0), 
+              child: FloatingActionButton.extended(
+                onPressed: _addLapangan,
+                backgroundColor: const Color(0xFFD7FC64),
+                foregroundColor: const Color(0xFF243153),
+                icon: const Icon(Icons.add),
+                label: const Text('Add'),
+              ),
             )
-          : null,
+            : null,
     );
   }
 }
