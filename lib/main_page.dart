@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/community/screen/forum_show_page.dart';
+import 'package:netly_mobile/modules/event/screen/event_page.dart';
 import 'package:netly_mobile/modules/homepage/screen/home_page.dart';
 import 'package:netly_mobile/modules/homepage/screen/favorite_page.dart';
 import 'package:netly_mobile/modules/homepage/widgets/bottom_nav.dart';
@@ -30,13 +32,13 @@ class _MainPageState extends State<MainPage> {
         bodyContent = const Center(child: Text("Halaman Booking (On Progress)"));
         break;
       case 1:
-        bodyContent = const Center(child: Text("Halaman Community (On Progress)"));
+        bodyContent = const ForumShowPage();
         break;
       case 2:
         bodyContent = const HomePage();
         break;
       case 3:
-        bodyContent = const Center(child: Text("Halaman Events (On Progress)"));
+        bodyContent = const EventPage();
         break;
       case 4:
         bodyContent = const FavoritePage(); 
