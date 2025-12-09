@@ -4,7 +4,6 @@ import 'package:netly_mobile/modules/auth/route/auth_route.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 import 'package:provider/provider.dart';
-import 'package:netly_mobile/modules/event/screen/event_page.dart';
 
 void main() {
   runApp(const MyApp());
