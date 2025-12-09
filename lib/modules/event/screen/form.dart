@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:netly_mobile/modules/event/model/event_model.dart'; // Pastikan import model
+import 'package:netly_mobile/modules/event/model/event_model.dart'; 
 
 class EventFormPage extends StatefulWidget {
-  final EventEntry? event; // Parameter opsional: Kalau ada isinya berarti mode EDIT
+  final EventEntry? event; // parameter opsional: kalau ada isinya berarti mode EDIT
 
   const EventFormPage({super.key, this.event});
 

@@ -23,7 +23,7 @@ class EventCard extends StatelessWidget {
             ),
           );
           if (result == true) {
-            // refresh pake fungsi dari parentny
+            // refresh pake fungsi dari parentnya
             if (onRefresh != null) {
               onRefresh!(); 
             }
@@ -127,7 +127,7 @@ class EventCard extends StatelessWidget {
                   ),
                   
                   const SizedBox(height: 8),
-                  // info slot Peserta
+                  // info slot peserta
                   Text(
                     "Slots: ${event.participantCount}/${event.maxParticipants}",
                     style: const TextStyle(

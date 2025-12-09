@@ -23,7 +23,15 @@ class _EventPageState extends State<EventPage> {
   bool _isAscending = false;
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/event/show-events-flutter/');
+    String url = 'http://localhost:8000/event/show-events-flutter/';
+
+    print("🚀 [DEBUG] Fetching events from: $url");
+    print("🍪 [DEBUG] Status Login saat fetch: ${request.loggedIn}");
+
+    final response = await request.get(url);
+    
+    print("📥 [DEBUG] Response Mentah dari Server:");
+    print(response);
 
     // convert Json dari django ke List<EventEntry>
     var data = response;
@@ -45,7 +53,11 @@ class _EventPageState extends State<EventPage> {
   }
 
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>(); // Akses request
+    final request = context.watch<CookieRequest>(); // akses request
+
+    // role checking
+    String role = request.jsonData['userData']?['role'] ?? "user"; 
+    bool isAdmin = role == 'admin';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -189,7 +201,7 @@ class _EventPageState extends State<EventPage> {
                       itemBuilder: (_, index) => EventCard(
                         event: snapshot.data![index],
                         onRefresh: () {
-                          // ini untuk0 membuat FutureBuilder menjalankan fetchEvents() lagi
+                          // ini untuk membuat FutureBuilder menjalankan fetchEvents() lagi
                           setState(() {});
                         },
                       ),
@@ -201,25 +213,25 @@ class _EventPageState extends State<EventPage> {
             ],
           ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const EventFormPage();
+      floatingActionButton: isAdmin 
+        ? FloatingActionButton.extended(
+            onPressed: () async {
+              final result = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const EventFormPage();
+                },
+              );
+              if (result == true) {
+                setState(() {});
+              }
             },
-          );
-
-          // jika result true, maka refresh daftar event
-          if (result == true) {
-            setState(() {});    // akan fetch ulang data event
-          }
-        },
-        label: const Text('Add Event', style: TextStyle(fontWeight: FontWeight.bold)),
-        icon: const Icon(Icons.add),
-        backgroundColor: _primaryBlue,
-        foregroundColor: _accentGreen,
-      ),
+            label: const Text('Add Event', style: TextStyle(fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.add),
+            backgroundColor: _primaryBlue,
+            foregroundColor: _accentGreen,
+          )
+        : null, // tombol hilang untuk user biasa (non admin)
     );
   }
 }

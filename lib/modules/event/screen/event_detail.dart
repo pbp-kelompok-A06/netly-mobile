@@ -22,8 +22,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
   final Color _whiteText = Colors.white;
   final Color _disabledGrey = Colors.grey;
 
-  // TODO: ganti isAdmin nanti pake data dari backend
-  final bool isAdmin = true;
   bool isJoined = false;
   late int currentParticipants; 
 
@@ -38,6 +36,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+
+    // role checking
+    String role = request.jsonData['userData']?['role'] ?? "user";
+    bool isAdmin = role == 'admin';
+
     // ambil tinggi layar
     final double screenHeight = MediaQuery.of(context).size.height;
     bool isFull = currentParticipants >= widget.event.maxParticipants;
@@ -56,19 +59,41 @@ class _EventDetailPageState extends State<EventDetailPage> {
             top: 0,
             left: 0,
             right: 0,
-            height: screenHeight * 0.35, // Tinggi sekitar 45% layar
+            height: screenHeight * 0.35, // tinggi sekitar 45% layar
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // foto lapangan (Ganti dengan image_url dari event)
+                // foto lapangan 
                 Image.network(
-                  widget.event.imageUrl.isNotEmpty 
-                      ? widget.event.imageUrl 
-                      : "https://via.placeholder.com/500x300", // placeholder kalo kosong
-                  fit: BoxFit.cover,
+                  widget.event.imageUrl, // URL dari event
+                  fit: BoxFit.cover,     // agar gambar memenuhi area
+                  
+                  // Builder untuk menangani status loading
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[200], // background abu-abu saat loading
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          // menampilkan progress download jika ada infonya
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
+                  
+                  // Builder untuk menangani error (URL rusak/kosong)
                   errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey,
-                    child: const Icon(Icons.broken_image, color: Colors.white),
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        // Menggunakan gambar default dari assets
+                        image: AssetImage('assets/images/default.jpg'), 
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
 
@@ -157,15 +182,15 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       Container(
                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                          decoration: BoxDecoration(
-                           color: widget.event.participantCount >= widget.event.maxParticipants 
+                           color: currentParticipants >= widget.event.maxParticipants 
                               ? Colors.red.withOpacity(0.2) 
                               : _accentGreen.withOpacity(0.5),
                            borderRadius: BorderRadius.circular(20),
                          ),
                          child: Text(
-                           widget.event.participantCount >= widget.event.maxParticipants ? "Penuh" : "Tersedia",
+                           currentParticipants >= widget.event.maxParticipants ? "Penuh" : "Tersedia",
                            style: TextStyle(
-                             color: widget.event.participantCount >= widget.event.maxParticipants ? Colors.red : _primaryBlue,
+                             color: currentParticipants >= widget.event.maxParticipants ? Colors.red : _primaryBlue,
                              fontWeight: FontWeight.bold,
                              fontSize: 12
                            ),
@@ -272,7 +297,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
               elevation: 0,
             ),
             onPressed: () {
-              // TODO: Tampilkan Dialog Konfirmasi Delete
               _showDeleteConfirmation(context);
             },
             child: const Text("Delete Event", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
@@ -299,7 +323,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 
                 // use delete_event_ajax
                 final response = await request.postJson(
-                  "http://localhost:8000/event/ajax/delete/${widget.event.id}/", 
+                  "http://localhost:8000/event/delete-flutter/${widget.event.id}/", 
                   jsonEncode({}),
                 );
 
@@ -311,7 +335,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       const SnackBar(content: Text("Event deleted successfully"), backgroundColor: Colors.red),
                     );
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(response['message'] ?? "Failed to delete")),
                     );
                   }
@@ -348,7 +372,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   "http://localhost:8000/event/join-flutter/${widget.event.id}/",
                   jsonEncode({}),
                 );
-                // ... logic handle response (sama seperti sebelumnya) ...
                 if (context.mounted) {
                    if (response['status'] == 'success') {
                       setState(() {
@@ -358,7 +381,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Join!"), backgroundColor: Colors.green));
                         } else {
                           isJoined = false;
-                          currentParticipants--;
+                          if (currentParticipants > 0) {
+                            currentParticipants--;
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Leave!"), backgroundColor: Colors.red));
                         }
                       });
