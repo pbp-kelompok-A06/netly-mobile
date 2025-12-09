@@ -4,7 +4,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart' as Lapangan;
-import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart' as Jadwal;
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart' ;
 import 'package:netly_mobile/modules/booking/services/booking_services.dart';
 // dummy 
 import 'booking_detail_screen.dart';
@@ -104,7 +104,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
      
      if (snapshot.hasData) {
       final Lapangan.Datum lapangan = snapshot.data!['lapangan'];
-      final List<Jadwal.Datum> jadwalList = snapshot.data!['jadwalList'];
+      final List<JadwalData> jadwalList = snapshot.data!['jadwalList'];
       
       if (jadwalList.isEmpty) {
        return Center(
@@ -197,7 +197,7 @@ return const SizedBox.shrink();
   );
  }
 
- Widget _buildScheduleTile(Jadwal.Datum jadwal) {
+ Widget _buildScheduleTile(JadwalData jadwal) {
   final bool isSelected = _selectedJadwalIds.contains(jadwal.id);
   final bool isAvailable = jadwal.isAvailable;
   final String formattedDate = DateFormat('EEEE, d MMM', 'id_ID').format(jadwal.tanggal);

@@ -3,6 +3,8 @@ import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart';
 import 'package:netly_mobile/modules/lapangan/service/lapangan_service.dart';
 import 'package:netly_mobile/modules/lapangan/widgets/lapangan_card.dart';
 import 'package:netly_mobile/modules/lapangan/screen/lapangan_form_page.dart';
+import 'package:netly_mobile/modules/lapangan/screen/lapangan_detail_page.dart';
+import 'package:netly_mobile/modules/lapangan/screen/lapangan_edit_page.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +18,6 @@ class LapanganListPage extends StatefulWidget {
 class _LapanganListPageState extends State<LapanganListPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,49 +26,108 @@ class _LapanganListPageState extends State<LapanganListPage> {
   }
 
   void _showDetail(Datum lapangan) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Detail ${lapangan.name} - Fitur dalam pengembangan'),
-        backgroundColor: Colors.blue,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LapanganDetailPage(lapanganId: lapangan.id),
       ),
-    );
+    ).then((result) {
+      if (result == true) {
+        setState(() {}); // Refresh list jika ada perubahan
+      }
+    });
   }
 
   void _editLapangan(Datum lapangan) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Edit ${lapangan.name} - Fitur dalam pengembangan'),
-        backgroundColor: Colors.orange,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LapanganEditPage(lapangan: lapangan),
       ),
-    );
+    ).then((result) {
+      if (result == true) {
+        setState(() {}); // Refresh list
+      }
+    });
   }
 
-  void _deleteLapangan(Datum lapangan) {
-    showDialog(
+  Future<void> _deleteLapangan(Datum lapangan) async {
+    final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Konfirmasi Hapus'),
-        content: Text('Apakah Anda yakin ingin menghapus ${lapangan.name}?'),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Confirm Delete'),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to delete "${lapangan.name}"?\n\nThis action cannot be undone.',
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Fitur hapus dalam pengembangan'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            },
-            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
+
+    if (shouldDelete == true && mounted) {
+      final request = context.read<CookieRequest>();
+      final lapanganService = LapanganService(request);
+
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      try {
+        final result = await lapanganService.deleteLapangan(lapangan.id);
+
+        if (mounted) {
+          Navigator.pop(context); // Close loading
+
+          if (result['success']) {
+            setState(() {}); // Refresh list
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result['message']),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result['message']),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.pop(context); // Close loading
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _addLapangan() {
@@ -87,15 +147,13 @@ class _LapanganListPageState extends State<LapanganListPage> {
     final lapanganService = LapanganService(request);
 
     // Check if user is admin
-    final userData = request.jsonData['userData'];
-    print(request.jsonData);
-    final bool isAdmin = userData != null && userData['role'] == 'admin';
+    final isAdmin = lapanganService.isUserAdmin();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Daftar Lapangan',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          isAdmin ? 'My Court' : 'List of Badminton Courts',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFF243153),
         foregroundColor: Colors.white,
@@ -110,7 +168,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Cari lapangan...',
+                hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -160,7 +218,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Terjadi kesalahan: ${snapshot.error}',
+                          'There is an error: ${snapshot.error}',
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
@@ -169,7 +227,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                             setState(() {});
                           },
                           icon: const Icon(Icons.refresh),
-                          label: const Text('Coba Lagi'),
+                          label: const Text('Try Again'),
                         ),
                       ],
                     ),
@@ -177,7 +235,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                 }
 
                 if (!snapshot.hasData || snapshot.data == null) {
-                  return const Center(child: Text('Tidak ada data'));
+                  return const Center(child: Text('No data'));
                 }
 
                 final lapanganList = snapshot.data!.data;
@@ -195,13 +253,27 @@ class _LapanganListPageState extends State<LapanganListPage> {
                         const SizedBox(height: 16),
                         Text(
                           _searchQuery.isEmpty
-                              ? 'Belum ada lapangan'
-                              : 'Tidak ada hasil untuk "$_searchQuery"',
+                              ? isAdmin
+                                    ? 'You dont have a court yet'
+                                    : 'There is no court yet'
+                              : 'No results for "$_searchQuery"',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey.shade600,
                           ),
                         ),
+                        if (isAdmin && _searchQuery.isEmpty) ...[
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: _addLapangan,
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add First Field'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF243153),
+                              foregroundColor: const Color(0xFFD7FC64),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   );
@@ -216,7 +288,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.65,
+                          childAspectRatio: 1.3,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),
@@ -244,7 +316,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
               backgroundColor: const Color(0xFFD7FC64),
               foregroundColor: const Color(0xFF243153),
               icon: const Icon(Icons.add),
-              label: const Text('Tambah'),
+              label: const Text('Add'),
             )
           : null,
     );

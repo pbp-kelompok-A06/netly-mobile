@@ -4,7 +4,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:netly_mobile/modules/booking/model/booking_model.dart';
 import 'package:netly_mobile/modules/booking/services/booking_services.dart';
-import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart' as Jadwal;
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart';
 
 class BookingDetailScreen extends StatefulWidget {
   final bookingId;
@@ -303,7 +303,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
   }
 
-  Widget _buildScheduleItem(Jadwal.Datum jadwal) {
+  Widget _buildScheduleItem(JadwalData jadwal) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),

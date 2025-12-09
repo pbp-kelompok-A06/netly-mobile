@@ -5,8 +5,8 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart'
     as Lapangan; // Import package untuk otentikasi
-import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart'
-    as Jadwal; // Import variabel pathWeb Anda
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart';
+     // Import variabel pathWeb Anda
 
 // Menggunakan Import Aliasing untuk mengatasi konflik nama kelas 'Datum'
 
@@ -24,8 +24,8 @@ class Booking {
   final double totalPrice;
   final DateTime createdAt;
 
-  // Menggunakan List Jadwal.Datum untuk detail jadwal
-  final List<Jadwal.Datum> jadwal;
+  // Menggunakan List JadwalData untuk detail jadwal
+  final List<JadwalData> jadwal;
 
   // Constructor privat, dipanggil hanya setelah fetching detail selesai
   Booking._({
@@ -74,7 +74,7 @@ class Booking {
     
       // Tunggu hasil dari fetching detail
       final Lapangan.Datum detailLapangan = await futureLapangan;
-      final List<Jadwal.Datum> detailsJadwal = await futureJadwal;
+      final List<JadwalData> detailsJadwal = await futureJadwal;
 
       // 3. Kembalikan objek Booking lengkap
       return Booking._(
@@ -118,7 +118,7 @@ class Booking {
   }
 
   // Fetches detail Jadwal menggunakan CookieRequest
-  static Future<Jadwal.Datum> _fetchJadwalDetail(
+  static Future<JadwalData> _fetchJadwalDetail(
     String id,
     CookieRequest request,
   ) async {
@@ -129,7 +129,7 @@ class Booking {
     
 
     if (response['status'] == 'success') {
-      return Jadwal.Datum.fromJson(response['data']);
+      return JadwalData.fromJson(response['data']);
     } else {
       throw Exception(
         'Gagal memuat detail Jadwal ID: $id. Pesan: ${response['message']}',

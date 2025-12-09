@@ -10,7 +10,7 @@ String jadwalLapanganModelToJson(JadwalLapanganModel data) => json.encode(data.t
 
 class JadwalLapanganModel {
     String status;
-    List<Datum> data;
+    List<JadwalData> data;
 
     JadwalLapanganModel({
         required this.status,
@@ -19,7 +19,7 @@ class JadwalLapanganModel {
 
     factory JadwalLapanganModel.fromJson(Map<String, dynamic> json) => JadwalLapanganModel(
         status: json["status"],
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        data: List<JadwalData>.from(json["data"].map((x) => JadwalData.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
@@ -28,14 +28,14 @@ class JadwalLapanganModel {
     };
 }
 
-class Datum {
+class JadwalData {
     String id;
     DateTime tanggal;
     String startMain;
     String endMain;
     bool isAvailable;
 
-    Datum({
+    JadwalData({
         required this.id,
         required this.tanggal,
         required this.startMain,
@@ -43,7 +43,7 @@ class Datum {
         required this.isAvailable,
     });
 
-    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+    factory JadwalData.fromJson(Map<String, dynamic> json) => JadwalData(
         id: json["id"],
         tanggal: DateTime.parse(json["tanggal"]),
         startMain: json["start_main"],

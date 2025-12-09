@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:netly_mobile/modules/booking/model/booking_model.dart';
 import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart'
     as Lapangan;
-import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart'
-    as Jadwal;
+import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 
 class BookingService {
@@ -27,9 +26,9 @@ class BookingService {
         jsonResponse['lapangan'] as Map<String, dynamic>,
       );
 
-      final List<Jadwal.Datum> jadwalList =
+      final List<JadwalData> jadwalList =
           (jsonResponse['jadwal_list'] as List)
-              .map((j) => Jadwal.Datum.fromJson(j as Map<String, dynamic>))
+              .map((j) => JadwalData.fromJson(j as Map<String, dynamic>))
               .toList();
 
       return {'lapangan': lapangan, 'jadwalList': jadwalList};
@@ -41,9 +40,9 @@ class BookingService {
         final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(
           jsonResponse['lapangan'] as Map<String, dynamic>,
         );
-        final List<Jadwal.Datum> jadwalList =
+        final List<JadwalData> jadwalList =
             (jsonResponse['jadwal_list'] as List)
-                .map((j) => Jadwal.Datum.fromJson(j as Map<String, dynamic>))
+                .map((j) => JadwalData.fromJson(j as Map<String, dynamic>))
                 .toList();
 
         return {'lapangan': lapangan, 'jadwalList': jadwalList};

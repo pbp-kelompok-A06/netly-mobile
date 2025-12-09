@@ -1,25 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart';
 import 'package:netly_mobile/modules/lapangan/service/lapangan_service.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-class LapanganFormPage extends StatefulWidget {
-  const LapanganFormPage({super.key});
+class LapanganEditPage extends StatefulWidget {
+  final Datum lapangan;
+
+  const LapanganEditPage({
+    super.key,
+    required this.lapangan,
+  });
 
   @override
-  State<LapanganFormPage> createState() => _LapanganFormPageState();
+  State<LapanganEditPage> createState() => _LapanganEditPageState();
 }
 
-class _LapanganFormPageState extends State<LapanganFormPage> {
+class _LapanganEditPageState extends State<LapanganEditPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _imageController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _locationController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _priceController;
+  late TextEditingController _imageController;
 
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with existing data
+    _nameController = TextEditingController(text: widget.lapangan.name);
+    _locationController = TextEditingController(text: widget.lapangan.location);
+    _descriptionController = TextEditingController(text: widget.lapangan.description);
+    _priceController = TextEditingController(text: widget.lapangan.price.toString());
+    _imageController = TextEditingController(text: widget.lapangan.image);
+  }
 
   @override
   void dispose() {
@@ -98,7 +115,8 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
     final lapanganService = LapanganService(request);
 
     try {
-      final result = await lapanganService.createLapangan(
+      final result = await lapanganService.updateLapangan(
+        id: widget.lapangan.id,
         name: _nameController.text.trim(),
         location: _locationController.text.trim(),
         description: _descriptionController.text.trim(),
@@ -109,10 +127,6 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
       if (!mounted) return;
 
       if (result['success']) {
-        // Log working URL if available
-        if (result['working_url'] != null) {
-        }
-        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result['message']),
@@ -121,48 +135,19 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
         );
         Navigator.pop(context, true); // Return true to indicate success
       } else {
-        // Check if error message is long (multiple URLs tried)
-        final errorMessage = result['message'] as String;
-        
-        if (errorMessage.length > 150) {
-          // Show detailed error in dialog
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.error_outline, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Endpoint Error'),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Text(errorMessage),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        } else {
-          // Show short error in SnackBar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Terjadi kesalahan: $e'),
+          content: Text('There is an error: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -180,7 +165,7 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add Court',
+          'Edit Court',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFF243153),
@@ -193,6 +178,29 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Info Card
+              Card(
+                color: Colors.blue[50],
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.blue),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Editing: ${widget.lapangan.name}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
               // Name Field
               TextFormField(
                 controller: _nameController,
@@ -304,7 +312,7 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
                         ),
                       )
                     : const Text(
-                        'Add Court',
+                        'Save Changes',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -315,9 +323,7 @@ class _LapanganFormPageState extends State<LapanganFormPage> {
 
               // Cancel Button
               OutlinedButton(
-                onPressed: _isLoading
-                    ? null
-                    : () => Navigator.pop(context),
+                onPressed: _isLoading ? null : () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(

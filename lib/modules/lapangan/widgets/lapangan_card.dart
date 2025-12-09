@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart';
 
 class LapanganCard extends StatelessWidget {
@@ -17,14 +18,14 @@ class LapanganCard extends StatelessWidget {
     this.isAdmin = false,
   });
 
-  // String formatPrice(int price) {
-  //   final formatter = NumberFormat.currency(
-  //     locale: 'id_ID',
-  //     symbol: 'Rp ',
-  //     decimalDigits: 0,
-  //   );
-  //   return formatter.format(price);
-  // }
+  String formatPrice(int price) {
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(price);
+  }
 
   @override
   Widget build(BuildContext context) {
