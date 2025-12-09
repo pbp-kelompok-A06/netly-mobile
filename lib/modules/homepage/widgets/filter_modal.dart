@@ -62,6 +62,7 @@ class _FilterModalState extends State<FilterModal> {
             value: (selectedLocation != null && cities.contains(selectedLocation)) 
                 ? selectedLocation 
                 : null,
+            dropdownColor: Colors.white,
             decoration: const InputDecoration(
               labelText: "Location",
               prefixIcon: Icon(Icons.location_on_outlined),

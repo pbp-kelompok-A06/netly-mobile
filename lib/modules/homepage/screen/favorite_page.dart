@@ -83,6 +83,7 @@ class _FavoritePageState extends State<FavoritePage> {
     bool? confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text("Remove Favorite"),
         content: const Text("Are you sure you want to remove this court?"),
         actions: [
