@@ -64,17 +64,18 @@ class ThreadPostCard extends StatelessWidget {
                           ),
                         ),
                         if(forumName != "")
-                        const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              child: Text("•", style: TextStyle(color: Colors.grey)),
-                        ),
-                        Text(
-                          "Forum: $forumName",
-                          style: const TextStyle(
-                            color: AppColors.textSecondaryCommunity,
-                            fontSize: 12,
+                          const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4),
+                                child: Text("•", style: TextStyle(color: Colors.grey)),
                           ),
-                        ),
+                        if(forumName != "")
+                          Text(
+                            "Forum: $forumName",
+                            style: const TextStyle(
+                              color: AppColors.textSecondaryCommunity,
+                              fontSize: 12,
+                            ),
+                          ),
                       ]
                     ),
                     

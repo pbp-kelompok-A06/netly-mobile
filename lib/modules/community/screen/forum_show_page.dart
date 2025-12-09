@@ -7,7 +7,8 @@ import '../model/forum.dart';
 import '../../../utils/colors.dart';
 import '../widgets/forum_card.dart';
 import '../widgets/thread_post_card.dart';
-
+import '../widgets/forum_dialog.dart';
+import '../../../utils/helper.dart';
 class ForumShowPage extends StatefulWidget {
   const ForumShowPage({super.key});
 
@@ -23,15 +24,6 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-  }
-  String timeAgo(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays > 365) return "${(diff.inDays / 365).floor()}y ago";
-    if (diff.inDays > 30) return "${(diff.inDays / 30).floor()}mo ago";
-    if (diff.inDays > 0) return "${diff.inDays}d ago";
-    if (diff.inHours > 0) return "${diff.inHours}h ago";
-    if (diff.inMinutes > 0) return "${diff.inMinutes}m ago";
-    return "Just now";
   }
   // fetch Async
   Future<List<ForumData>> fetchForum(CookieRequest request) async {
@@ -90,7 +82,18 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
         actions: [
           IconButton(
             icon: const Icon(Icons.add, color: Colors.grey),
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context, 
+                builder: (context) {
+                  return CreateForumDialog(
+                    onForumCreated: () {
+                      setState(() {});
+                    },
+                  );
+                }
+              );
+            },
           ),
         ],
       ),
@@ -256,6 +259,9 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
           child: ForumCard(
             data: data[index],
             myForum: true,
+            onDelete: (){
+              setState((){});
+            },
           ),
         );
       },

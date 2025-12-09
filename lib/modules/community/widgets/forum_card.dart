@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/utils/path_web.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import '../model/forum.dart';
 import '../../../utils/colors.dart';
 import '../screen/forum_post_page.dart'; 
@@ -6,15 +9,33 @@ import '../screen/forum_post_page.dart';
 class ForumCard extends StatelessWidget {
   final ForumData data;
   final bool myForum;
+  final VoidCallback? onDelete; 
 
   const ForumCard({
     super.key,
     required this.data,
-    this.myForum = false
+    this.myForum = false,
+    this.onDelete
   });
+
+  Future<bool> deleteForum(CookieRequest request) async{
+    request.headers['X-Requested-With'] = 'XMLHttpRequest';
+    final response = await request.post(
+      '$pathWeb/community/delete-forum/${data.id}/', 
+      {}
+    );
+
+    if(response['success'] == true){
+      return true;
+    }
+    return false;
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>(); 
+
     return GestureDetector(
       onTap: () {
         // check user is part of member of forum or not
@@ -90,9 +111,13 @@ class ForumCard extends StatelessWidget {
                       
                       // Delete Icon
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          await deleteForum(request);
+                          if (onDelete != null){
+                            onDelete!(); 
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Delete clicked"))
+                              const SnackBar(content: Text("Delete successfully!"))
                           );
                           
                         },

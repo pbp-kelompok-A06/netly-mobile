@@ -7,6 +7,8 @@ import '../model/post.dart';
 import '../../../utils/colors.dart'; 
 import '../widgets/thread_post_card.dart';
 
+import 'package:netly_mobile/utils/helper.dart';
+
 class ForumPostPage extends StatefulWidget {
   final ForumData forumData;
 
@@ -73,15 +75,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
     }
   }
 
-  String _timeAgo(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays > 365) return "${(diff.inDays / 365).floor()}y ago";
-    if (diff.inDays > 30) return "${(diff.inDays / 30).floor()}mo ago";
-    if (diff.inDays > 0) return "${diff.inDays}d ago";
-    if (diff.inHours > 0) return "${diff.inHours}h ago";
-    if (diff.inMinutes > 0) return "${diff.inMinutes}m ago";
-    return "Just now";
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +232,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
                           title: post.header,
                           content: post.content,
                           userName: post.user.username,
-                          timeAgo: _timeAgo(post.createdAt),
+                          timeAgo: timeAgo(post.createdAt),
                         );
                       },
                     ),
