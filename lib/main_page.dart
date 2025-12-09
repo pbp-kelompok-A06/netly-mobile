@@ -14,7 +14,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 2; // Default Home
-  bool _isHomePressed = false; 
+  bool _isHomePressed = false;
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
@@ -29,7 +29,9 @@ class _MainPageState extends State<MainPage> {
     Widget bodyContent;
     switch (_selectedIndex) {
       case 0:
-        bodyContent = const Center(child: Text("Halaman Booking (On Progress)"));
+        bodyContent = const Center(
+          child: Text("Halaman Booking (On Progress)"),
+        );
         break;
       case 1:
         bodyContent = const ForumShowPage();
@@ -41,7 +43,7 @@ class _MainPageState extends State<MainPage> {
         bodyContent = const EventPage();
         break;
       case 4:
-        bodyContent = const FavoritePage(); 
+        bodyContent = const FavoritePage();
         break;
       default:
         bodyContent = const HomePage();
@@ -62,7 +64,7 @@ class _MainPageState extends State<MainPage> {
           _onHomeTapped();
         },
         onTapCancel: () => setState(() => _isHomePressed = false),
-        
+
         child: AnimatedScale(
           scale: _isHomePressed ? 0.9 : 1.0,
           duration: const Duration(milliseconds: 100),
@@ -74,9 +76,21 @@ class _MainPageState extends State<MainPage> {
             decoration: BoxDecoration(
               color: const Color(0xFF243153),
               shape: BoxShape.circle,
-              boxShadow: _isHomePressed 
-                ? [BoxShadow(color: Colors.black26, blurRadius: 2, offset: const Offset(0, 1))]
-                : [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
+              boxShadow: _isHomePressed
+                  ? [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
             ),
             child: const Icon(
               Icons.home_rounded,
