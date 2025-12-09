@@ -491,26 +491,6 @@ class _LapanganDetailPageState extends State<LapanganDetailPage> {
                         ),
                       ],
                     ),
-      bottomNavigationBar: !isAdmin && _lapangan != null
-          ? SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: ElevatedButton(
-                  onPressed: _navigateToJadwal,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF243153),
-                    foregroundColor: const Color(0xFFD7FC64),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text(
-                    'View Schedule and Booking',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            )
-          : null,
     );
   }
 }
