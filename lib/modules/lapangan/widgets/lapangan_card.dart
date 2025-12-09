@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 
 class LapanganCard extends StatelessWidget {
   final Datum lapangan;
@@ -18,6 +19,19 @@ class LapanganCard extends StatelessWidget {
     this.isAdmin = false,
   });
 
+  String getImageUrl() {
+    String rawUrl = lapangan.image;
+    if (rawUrl.isEmpty) return "";
+    if (!rawUrl.startsWith('http')) {
+      if (rawUrl.startsWith('/')) {
+        rawUrl = rawUrl.substring(1); // Hapus slash depan
+      }
+      rawUrl = "$pathWeb/$rawUrl";
+    }
+
+    return "$pathWeb/proxy-image/?url=${Uri.encodeComponent(rawUrl)}";
+  }
+
   String formatPrice(int price) {
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
@@ -31,9 +45,7 @@ class LapanganCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -47,13 +59,13 @@ class LapanganCard extends StatelessWidget {
               ),
               child: lapangan.image.isNotEmpty
                   ? Image.network(
-                      lapangan.image,
-                      height: 180,
+                      getImageUrl(),
+                      height: 80,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          height: 180,
+                          height: 80,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -71,13 +83,10 @@ class LapanganCard extends StatelessWidget {
                       },
                     )
                   : Container(
-                      height: 180,
+                      height: 80,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [
-                            Colors.blue.shade400,
-                            Colors.blue.shade600,
-                          ],
+                          colors: [Colors.blue.shade400, Colors.blue.shade600],
                         ),
                       ),
                       child: const Icon(
@@ -144,12 +153,9 @@ class LapanganCard extends StatelessWidget {
                   // Admin name
                   Text(
                     'Oleh: ${lapangan.adminName}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
-                  
+
                   // Admin actions
                   if (isAdmin) ...[
                     const SizedBox(height: 12),
@@ -158,7 +164,7 @@ class LapanganCard extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: onEdit,
-                            icon: const Icon(Icons.edit, size: 16),
+                            icon: const Icon(Icons.edit, size: 8),
                             label: const Text('Edit'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -169,7 +175,7 @@ class LapanganCard extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: onDelete,
-                            icon: const Icon(Icons.delete, size: 16),
+                            icon: const Icon(Icons.delete, size: 8),
                             label: const Text('Hapus'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.red,
