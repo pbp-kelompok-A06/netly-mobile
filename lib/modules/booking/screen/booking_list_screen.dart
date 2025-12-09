@@ -45,7 +45,7 @@ class _BookingListPageState extends State<BookingListPage> {
           _isAdmin = adminInfo['is_admin'] == true;
           _isAdminChecked = true; // Status admin sudah diketahui
         });
-        print('Admin Status Check Complete: isAdmin=$_isAdmin');
+        
       }
     } catch (e) {
       print('Failed to check admin status: $e');
@@ -244,10 +244,7 @@ class _BookingListPageState extends State<BookingListPage> {
                         _futureBookings = _fetchBookings();
                       });
                       
-                      // Tampilkan SnackBar jika hasil kembali adalah true (berhasil dihapus dari detail admin screen)
-                      // Catatan: Ini hanya akan berfungsi jika Anda menghapus pushAndRemoveUntil di detail admin screen,
-                      // tapi karena kita menggunakan pushAndRemoveUntil di admin screen, SnackBar dihandle di sana.
-                      // Namun, kita tetap melakukan refresh data di sini.
+                   
                     });
                   },
                   child: Container(

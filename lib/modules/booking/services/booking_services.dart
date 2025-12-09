@@ -103,9 +103,7 @@ class BookingService {
     String lapanganId,
     List<String> jadwalIds,
   ) async {
-    print(
-      "Creating booking for Lapangan ID: $lapanganId with Jadwal IDs: $jadwalIds",
-    );
+
     final url = '$pathWeb/booking/create_booking_flutter/';
 
     final Map<String, dynamic> body = {
@@ -115,7 +113,7 @@ class BookingService {
     };
 
     final response = await request.postJson(url, jsonEncode(body));
-    print("response from createBooking: $response");
+    
     if (response is Map) {
       final Map<String, dynamic> data = response as Map<String, dynamic>;
       if (data['success'] == true) {
@@ -136,7 +134,7 @@ class BookingService {
     final url = '$pathWeb/booking/booking_detail/$bookingId/complete/';
 
     final response = await request.postJson(url, jsonEncode({}));
-    print("RESPONSE: $response");
+    
 
     if (response is Map) {
       final Map<String, dynamic> data = response as Map<String, dynamic>;
@@ -166,13 +164,13 @@ class BookingService {
     final url =
         '$pathWeb/booking/delete_booking/$bookingId/'; // Sesuaikan dengan URL Django Anda
     
-    print("Deleting booking with ID: $bookingId");
+    
     // Melakukan POST request
     final response = await request.postJson(
       url,
       jsonEncode({}), // POST body kosong karena booking_id ada di URL
     );
-    print(  "DELETE BOOKING RESPONSE: $response");
+    
     // Cek apakah respons memiliki kunci 'success'
     // return JsonResponse({'success': False, 'message': 'Booking tidak ditemukan.'}, status=404)
     if (response is Map && response['success'] == true) {

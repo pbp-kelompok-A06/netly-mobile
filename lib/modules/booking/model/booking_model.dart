@@ -70,8 +70,8 @@ class Booking {
     );
 
     try {
-          print("RAW BOOKING JSON:");
-    print(json);
+          
+    
       // Tunggu hasil dari fetching detail
       final Lapangan.Datum detailLapangan = await futureLapangan;
       final List<Jadwal.Datum> detailsJadwal = await futureJadwal;
@@ -106,8 +106,7 @@ class Booking {
     final url = "$pathWeb/lapangan/api/lapangan/$id/";
     final response = await request.get(url);
 
-    print("LAPANGAN DETAIL:");
-    print(response['data']);
+
 
     if (response['status'] == 'success') {
       return Lapangan.Datum.fromJson(response['data']);
@@ -123,11 +122,11 @@ class Booking {
     String id,
     CookieRequest request,
   ) async {
-    print(  "Fetching Jadwal ID: $id");
+    
     final url = "$pathWeb/booking/get_jadwal_detail_json/$id/";
     final response = await request.get(url);
-    print("JADWAL DETAIL:");
-    print(response);
+    
+    
 
     if (response['status'] == 'success') {
       return Jadwal.Datum.fromJson(response['data']);

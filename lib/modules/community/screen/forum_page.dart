@@ -68,7 +68,7 @@ class ForumPage extends StatelessWidget {
               final response = await request.logout("$pathWeb/logout-ajax/");
               if (response['status'] == 'success') {
                 if (context.mounted) {
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: AuthRoutes.routes[AuthRoutes.login]!,
@@ -82,7 +82,7 @@ class ForumPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: BookingRoutes.routes[BookingRoutes.tes2]!,
@@ -94,7 +94,7 @@ class ForumPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: BookingRoutes.routes[BookingRoutes.tes3]!,
@@ -106,7 +106,7 @@ class ForumPage extends StatelessWidget {
           ),
                     ElevatedButton(
             onPressed: () async {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: BookingRoutes.routes[BookingRoutes.tes4]!,
