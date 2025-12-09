@@ -24,7 +24,7 @@ class _EventPageState extends State<EventPage> {
   bool _isAscending = false;
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    String url = 'http://$pathWeb/event/show-events-flutter/';
+    String url = '$pathWeb/event/show-events-flutter/';
 
     final response = await request.get(url);
 
