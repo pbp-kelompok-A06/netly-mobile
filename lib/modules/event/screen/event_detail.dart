@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/event/model/event_model.dart';
 import 'package:netly_mobile/modules/event/screen/form.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -88,7 +89,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     );
                   },
                   
-                  // Builder untuk menangani error (URL rusak/kosong)
+                  // builder untuk menangani error (URL rusak/kosong)
                   errorBuilder: (context, error, stackTrace) => Container(
                     decoration: const BoxDecoration(
                       image: DecorationImage(
@@ -326,7 +327,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 
                 // use delete_event_ajax
                 final response = await request.postJson(
-                  "http://localhost:8000/event/delete-flutter/${widget.event.id}/", 
+                  "http://$pathWeb/event/delete-flutter/${widget.event.id}/", 
                   jsonEncode({}),
                 );
 
@@ -372,7 +373,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             ? null 
             : () async {
                 final response = await request.postJson(
-                  "http://localhost:8000/event/join-flutter/${widget.event.id}/",
+                  "http://$pathWeb/event/join-flutter/${widget.event.id}/",
                   jsonEncode({}),
                 );
                 if (context.mounted) {

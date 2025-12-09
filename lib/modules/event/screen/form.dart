@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:netly_mobile/modules/event/model/event_model.dart'; 
@@ -212,10 +213,10 @@ class _EventFormPageState extends State<EventFormPage> {
               String url;
               if (widget.event != null) {
                 // endpoint edit
-                url = "http://localhost:8000/event/edit-flutter/${widget.event!.id}/";
+                url = "http://$pathWeb/event/edit-flutter/${widget.event!.id}/";
               } else {
                 // endpoint create
-                url = "http://localhost:8000/event/create-flutter/";
+                url = "http://$pathWeb/event/create-flutter/";
               }
 
               final response = await request.postJson(

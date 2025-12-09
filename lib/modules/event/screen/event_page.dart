@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 import 'package:provider/provider.dart';
 
 import 'package:netly_mobile/modules/event/model/event_model.dart';
@@ -23,7 +24,7 @@ class _EventPageState extends State<EventPage> {
   bool _isAscending = false;
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    String url = 'http://localhost:8000/event/show-events-flutter/';
+    String url = 'http://$pathWeb/event/show-events-flutter/';
 
     final response = await request.get(url);
 
