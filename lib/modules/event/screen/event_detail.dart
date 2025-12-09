@@ -327,7 +327,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 
                 // use delete_event_ajax
                 final response = await request.postJson(
-                  "http://$pathWeb/event/delete-flutter/${widget.event.id}/", 
+                  "$pathWeb/event/delete-flutter/${widget.event.id}/", 
                   jsonEncode({}),
                 );
 
@@ -373,7 +373,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             ? null 
             : () async {
                 final response = await request.postJson(
-                  "http://$pathWeb/event/join-flutter/${widget.event.id}/",
+                  "$pathWeb/event/join-flutter/${widget.event.id}/",
                   jsonEncode({}),
                 );
                 if (context.mounted) {

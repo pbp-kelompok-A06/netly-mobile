@@ -213,10 +213,10 @@ class _EventFormPageState extends State<EventFormPage> {
               String url;
               if (widget.event != null) {
                 // endpoint edit
-                url = "http://$pathWeb/event/edit-flutter/${widget.event!.id}/";
+                url = "$pathWeb/event/edit-flutter/${widget.event!.id}/";
               } else {
                 // endpoint create
-                url = "http://$pathWeb/event/create-flutter/";
+                url = "$pathWeb/event/create-flutter/";
               }
 
               final response = await request.postJson(
