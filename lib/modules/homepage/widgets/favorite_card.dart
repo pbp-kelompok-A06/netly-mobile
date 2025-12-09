@@ -17,8 +17,7 @@ class FavoriteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final court = favoriteItem.lapangan;
-    
-    // === Logic Badge Label ===
+
     Color badgeBgColor;
     Color badgeTextColor;
     String labelText;
