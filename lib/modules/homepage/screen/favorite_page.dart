@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:netly_mobile/modules/homepage/model/home_model.dart';
-import 'package:netly_mobile/modules/homepage/widgets/favorite_card.dart'; // Import Widget tadi
+import 'package:netly_mobile/modules/homepage/widgets/favorite_card.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 
 class FavoritePage extends StatefulWidget {
@@ -37,6 +37,46 @@ class _FavoritePageState extends State<FavoritePage> {
     return listFav;
   }
 
+  void _showCustomSnackBar(String message, {bool isError = false}) {
+    // Hapus snackbar lama biar ga numpuk
+    ScaffoldMessenger.of(context).clearSnackBars();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        // Isi Pesan (Icon + Teks)
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white, 
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        // Style Melayang & Rounded
+        behavior: SnackBarBehavior.floating, 
+        backgroundColor: isError ? Colors.red.shade400 : const Color(0xFF243153), 
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        
+        // Atur posisi melayang (di atas navbar)
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30), 
+        duration: const Duration(milliseconds: 1500), 
+      ),
+    );
+  }
+
   // Logic Hapus
   Future<void> removeFavorite(CookieRequest request, String favId) async {
     // Tampilkan Dialog Konfirmasi
@@ -60,15 +100,11 @@ class _FavoritePageState extends State<FavoritePage> {
       try {
         final response = await request.post(url, {});
         if (response['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Removed from favorites"), backgroundColor: Colors.green),
-          );
-          setState(() {}); // Refresh UI
+          _showCustomSnackBar("Removed from favorites");
+          setState(() {}); 
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to remove"), backgroundColor: Colors.red),
-        );
+        _showCustomSnackBar("Failed to remove", isError: true);
       }
     }
   }
@@ -122,7 +158,6 @@ class _FavoritePageState extends State<FavoritePage> {
       ),
       body: Column(
         children: [
-          // === FILTER BAR ===
           Container(
             width: double.infinity,
             color: Colors.white,
@@ -134,13 +169,12 @@ class _FavoritePageState extends State<FavoritePage> {
                   _buildFilterChip('', 'All'),
                   _buildFilterChip('Rumah', '🏠 Near Home'),
                   _buildFilterChip('Kantor', '🏢 Near Office'),
-                  _buildFilterChip('Others', '📍 Others'),
+                  _buildFilterChip('Lainnya', '📍 Others'), 
                 ],
               ),
             ),
           ),
 
-          // === GRID CONTENT ===
           Expanded(
             child: FutureBuilder(
               future: fetchFavorites(request),
@@ -148,7 +182,6 @@ class _FavoritePageState extends State<FavoritePage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data.isEmpty) {
-                  // EMPTY STATE
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -163,14 +196,13 @@ class _FavoritePageState extends State<FavoritePage> {
                     ),
                   );
                 } else {
-                  // DATA ADA
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 0.8, // Proporsional
+                      childAspectRatio: 0.8, 
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (_, index) {

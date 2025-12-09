@@ -23,7 +23,6 @@ class _FilterModalState extends State<FilterModal> {
   late TextEditingController minController;
   late TextEditingController maxController;
 
-  // Daftar Kota (Hardcode biar mirip Web)
   final List<String> cities = [
     "Jakarta Barat", "Jakarta Selatan", "Jakarta Utara", "Jakarta Pusat", "Jakarta Timur",
     "Depok", "Bogor", "Tangerang", "Tangerang Selatan", "Bekasi",
@@ -58,8 +57,7 @@ class _FilterModalState extends State<FilterModal> {
           const SizedBox(height: 20),
           const Text("Filter Courts", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
-          
-          // --- 1. LOCATION DROPDOWN ---
+
           DropdownButtonFormField<String>(
             value: (selectedLocation != null && cities.contains(selectedLocation)) 
                 ? selectedLocation 
@@ -84,7 +82,6 @@ class _FilterModalState extends State<FilterModal> {
           ),
           const SizedBox(height: 16),
 
-          // --- 2. PRICE INPUTS ---
           Row(
             children: [
               Expanded(
@@ -114,7 +111,6 @@ class _FilterModalState extends State<FilterModal> {
           ),
           const SizedBox(height: 24),
 
-          // --- 3. BUTTONS ---
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -133,7 +129,7 @@ class _FilterModalState extends State<FilterModal> {
           Center(
             child: TextButton(
               onPressed: () {
-                widget.onApply(null, null, null); // Reset
+                widget.onApply(null, null, null); 
                 Navigator.pop(context);
               },
               child: const Text("Reset Filter", style: TextStyle(color: Colors.red)),

@@ -11,64 +11,80 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  // Index halaman yang sedang aktif
-  // 0: Booking, 1: Community, 2: Home (Khusus), 3: Event, 4: Favorites
-  int _selectedIndex = 2; // Default mulai di Home
+  int _selectedIndex = 2; // Default Home
+  bool _isHomePressed = false; 
 
-  // Daftar Halaman
-  final List<Widget> _pages = [
-    const Center(child: Text("Halaman Booking (On Progress)")), // Index 0
-    const Center(child: Text("Halaman Community (On Progress)")), // Index 1
-    const HomePage(), // Index 2 (HOME)
-    const Center(child: Text("Halaman Events (On Progress)")), // Index 3
-    const FavoritePage(), // Index 4 (FAVORITES)
-  ];
-
-  // Fungsi ganti halaman dari Navbar
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
-  // Fungsi Tombol Home Tengah
   void _onHomeTapped() {
-    setState(() {
-      _selectedIndex = 2; // Kembali ke Home
-    });
+    setState(() => _selectedIndex = 2);
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget bodyContent;
+    switch (_selectedIndex) {
+      case 0:
+        bodyContent = const Center(child: Text("Halaman Booking (On Progress)"));
+        break;
+      case 1:
+        bodyContent = const Center(child: Text("Halaman Community (On Progress)"));
+        break;
+      case 2:
+        bodyContent = const HomePage();
+        break;
+      case 3:
+        bodyContent = const Center(child: Text("Halaman Events (On Progress)"));
+        break;
+      case 4:
+        bodyContent = const FavoritePage(); 
+        break;
+      default:
+        bodyContent = const HomePage();
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      
-      // === BODY YANG BERUBAH-UBAH ===
-      // Menggunakan IndexedStack agar state halaman (seperti scroll position) terjaga
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
 
-      // === TOMBOL TENGAH (HOME) ===
+      extendBody: true,
+
+      body: bodyContent,
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        width: 65,
-        height: 65,
-        child: FloatingActionButton(
-          onPressed: _onHomeTapped,
-          backgroundColor: const Color(0xFF243153),
-          shape: const CircleBorder(),
-          elevation: 4,
-          child: Icon(
-            Icons.home_rounded,
-            color: _selectedIndex == 2 ? const Color(0xFFD7FC64) : Colors.grey, // Aktif/Nonaktif color
-            size: 35,
+      floatingActionButton: GestureDetector(
+        onTapDown: (_) => setState(() => _isHomePressed = true),
+        onTapUp: (_) {
+          setState(() => _isHomePressed = false);
+          _onHomeTapped();
+        },
+        onTapCancel: () => setState(() => _isHomePressed = false),
+        
+        child: AnimatedScale(
+          scale: _isHomePressed ? 0.9 : 1.0,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            width: 65,
+            height: 65,
+            decoration: BoxDecoration(
+              color: const Color(0xFF243153),
+              shape: BoxShape.circle,
+              boxShadow: _isHomePressed 
+                ? [BoxShadow(color: Colors.black26, blurRadius: 2, offset: const Offset(0, 1))]
+                : [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
+            ),
+            child: const Icon(
+              Icons.home_rounded,
+              color: Color(0xFFD7FC64),
+              size: 35,
+            ),
           ),
         ),
       ),
 
-      // === NAVBAR BAWAH ===
       bottomNavigationBar: CustomBottomNav(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,

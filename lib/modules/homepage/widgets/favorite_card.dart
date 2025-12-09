@@ -18,7 +18,7 @@ class FavoriteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final court = favoriteItem.lapangan;
     
-    // === Logic Badge Label (TETAP SAMA) ===
+    // === Logic Badge Label ===
     Color badgeBgColor;
     Color badgeTextColor;
     String labelText;
@@ -26,45 +26,41 @@ class FavoriteCard extends StatelessWidget {
     if (favoriteItem.label == 'Rumah') {
       badgeBgColor = Colors.blue.shade50;
       badgeTextColor = const Color(0xFF243153);
-      labelText = "🏠 Near Home";
+      labelText = "Home";
     } else if (favoriteItem.label == 'Kantor') {
       badgeBgColor = Colors.purple.shade50;
       badgeTextColor = Colors.purple.shade800;
-      labelText = "🏢 Near Office";
+      labelText = "Office";
     } else {
       badgeBgColor = Colors.grey.shade100;
       badgeTextColor = Colors.grey.shade600;
-      labelText = "📍 Other";
+      labelText = "Other";
     }
 
-    // === 👇 LOGIC PROXY IMAGE (YANG DIUBAH) ===
     String rawUrl = court.image;
-    // 1. Pastikan URL absolut dulu
     if (!rawUrl.startsWith('http')) {
       if (rawUrl.startsWith('/')) rawUrl = rawUrl.substring(1);
       rawUrl = "$pathWeb/$rawUrl";
     }
-    
-    // 2. Bungkus dengan Proxy Django agar lolos CORS di Chrome
     String proxyUrl = "$pathWeb/proxy-image/?url=${Uri.encodeComponent(rawUrl)}";
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16), 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {
             Navigator.push(
               context,
@@ -76,60 +72,48 @@ class FavoriteCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === HEADER: GAMBAR & TOMBOL DELETE ===
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                     child: SizedBox(
-                      height: 135,
+                      height: 100, 
                       width: double.infinity,
                       child: CachedNetworkImage(
-                        imageUrl: proxyUrl, // 👈 PAKAI URL PROXY DI SINI
+                        imageUrl: proxyUrl,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
-                          color: Colors.grey[200],
+                          color: Colors.grey[100],
                           child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
                         ),
                         errorWidget: (context, url, error) => Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.blue.shade400, Colors.blue.shade600],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.sports_tennis, size: 48, color: Colors.white54),
-                          ),
+                          color: Colors.blue.shade50,
+                          child: Icon(Icons.sports_tennis, size: 40, color: Colors.blue.shade200),
                         ),
                       ),
                     ),
                   ),
                   
-                  // Tombol Hapus
+                  // Tombol Hapus (Pojok Kanan Atas)
                   Positioned(
-                    top: 8,
-                    right: 8,
+                    top: 6,
+                    right: 6,
                     child: InkWell(
                       onTap: () => onRemove(favoriteItem.id),
                       child: Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.95),
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)
-                          ]
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)]
                         ),
-                        child: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                        child: const Icon(Icons.delete_outline, color: Colors.red, size: 16),
                       ),
                     ),
                   ),
                 ],
               ),
 
-              // === CONTENT INFO (TETAP SAMA) ===
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -137,49 +121,55 @@ class FavoriteCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Group Nama & Lokasi
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             court.name,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF243153),
-                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF243153),
+                              height: 1.1,
+                            ),
                           ),
                           const SizedBox(height: 4),
-                          
                           Row(
                             children: [
-                              const Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
+                              const Icon(Icons.location_on_rounded, size: 12, color: Colors.grey),
                               const SizedBox(width: 2),
                               Expanded(
                                 child: Text(
                                   court.location,
-                                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                                 ),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      
+
+                      // Group Harga & Label
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
+                          // Harga
                           Text(
                             "Rp ${court.formattedPrice}",
                             style: const TextStyle(
                               fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w900,
                               color: Color(0xFF243153),
                             ),
                           ),
+                          
+                          // Label Badge (Rumah/Kantor)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(

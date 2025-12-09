@@ -5,10 +5,8 @@ import 'package:netly_mobile/modules/homepage/model/home_model.dart';
 import 'package:netly_mobile/modules/homepage/widgets/home_widget.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 
-// Import widget yang sudah kita pisah
 import 'package:netly_mobile/modules/homepage/widgets/top_header.dart';
 import 'package:netly_mobile/modules/homepage/widgets/filter_modal.dart';
-import 'package:netly_mobile/modules/homepage/widgets/bottom_nav.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,17 +27,17 @@ class _HomePageState extends State<HomePage> {
     // Bangun URL dengan parameter Filter
     String url = "$pathWeb/api/courts/?";
 
-    // 1. Search Bar (Bisa cari nama atau kota secara umum)
+    // Search Bar (Bisa cari nama atau kota secara umum)
     if (_searchController.text.isNotEmpty) {
       url += "q=${_searchController.text}&";
     }
 
-    // 2. Location Dropdown (Filter Spesifik Kota)
+    // Location Dropdown (Filter Spesifik Kota)
     if (_location != null && _location!.isNotEmpty) {
       url += "location=$_location&";
     }
 
-    // 3. Price Range
+    // Price Range
     if (_minPrice != null && _minPrice!.isNotEmpty) {
       url += "min_price=$_minPrice&";
     }
@@ -89,63 +87,74 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Column(
-        children: [
-          // 1. HEADER (Logo, Search, Filter)
-          TopHeader(
-            searchController: _searchController,
-            onFilterTap: _openFilter,
-            onSearchSubmitted: (val) => setState(() {}),
+    String userName = "Guest User";
+    String userImage = "";
+
+    if (request.loggedIn) {
+        if (request.jsonData.containsKey('userData')) {
+            userName = request.jsonData['userData']['username'] ?? 
+                       request.jsonData['userData']['full_name'] ?? 
+                       request.jsonData['username'] ?? "User"; 
+            
+            userImage = request.jsonData['userData']['profile_picture'] ?? "";
+        } else {
+            userName = request.jsonData['username'] ?? "User";
+        }
+    }
+
+    return Column(
+      children: [
+        // (Logo, Search, Filter)
+        TopHeader(
+          searchController: _searchController,
+          onFilterTap: _openFilter,
+          onSearchSubmitted: (val) => setState(() {}),
+          // Kirim Data User ke TopHeader
+          userName: userName,
+          userProfileImage: userImage,
+        ),
+
+        Expanded(
+          child: FutureBuilder(
+            future: fetchCourts(request),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("Error: ${snapshot.error}"));
+              } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search_off, size: 60, color: Colors.grey),
+                      SizedBox(height: 10),
+                      Text(
+                        "No courts found.",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.8, // Rasio kartu tinggi
+                  ),
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (_, index) {
+                    return CourtCard(court: snapshot.data![index]);
+                  },
+                );
+              }
+            },
           ),
-
-          // 2. GRID LIST
-          Expanded(
-            child: FutureBuilder(
-              future: fetchCourts(request),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (!snapshot.hasData || snapshot.data.isEmpty) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.search_off, size: 60, color: Colors.grey),
-                        SizedBox(height: 10),
-                        Text(
-                          "No courts found.",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.75, // Rasio kartu tinggi
-                        ),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (_, index) {
-                      return CourtCard(court: snapshot.data![index]);
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-
-
+        ),
+      ],
     );
   }
 }

@@ -1,115 +1,166 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 
 class TopHeader extends StatelessWidget {
   final TextEditingController searchController;
   final VoidCallback onFilterTap;
   final Function(String) onSearchSubmitted;
+  
+  final String? userProfileImage; 
+  final String? userName; 
 
   const TopHeader({
     super.key,
     required this.searchController,
     required this.onFilterTap,
     required this.onSearchSubmitted,
+    this.userProfileImage,
+    this.userName,
   });
+
+  String _getInitials(String? name) {
+    if (name == null || name.isEmpty) return "U"; 
+    return name[0].toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF243153), // Navy Netly
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          child: Row(
+      color: Colors.white,
+
+      padding: const EdgeInsets.fromLTRB(20, 25, 20, 10), 
+      
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // 1. LOGO 'N' (Tetap seperti sebelumnya)
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A2238),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
-                child: const Center(
-                  child: Text(
-                    "N",
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Hello,", 
                     style: TextStyle(
-                      color: Color(0xFFD7FC64),
-                      fontWeight: FontWeight.w900,
-                      fontSize: 24,
-                      fontFamily: 'Arial',
+                      fontSize: 14, 
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500
                     ),
                   ),
-                ),
-              ),
-              
-              const SizedBox(width: 12),
-
-              // 2. SEARCH BAR DENGAN TOMBOL KLIK
-              Expanded(
-                child: Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TextField(
-                    controller: searchController,
-                    style: const TextStyle(color: Colors.white),
-                    textAlignVertical: TextAlignVertical.center,
-                    
-                    // Supaya tombol search di keyboard HP tetap jalan
-                    onSubmitted: onSearchSubmitted, 
-                    
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: "Search courts...",
-                      hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.only(left: 16), // Jarak teks dari kiri
-                      
-                      // 👇 INI PERUBAHANNYA: Tombol Search di Kanan
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.search, color: Color(0xFFD7FC64)), // Warna Lime biar kelihatan tombol
-                        onPressed: () {
-                          // Panggil fungsi search saat tombol diklik
-                          onSearchSubmitted(searchController.text);
-                        },
-                        tooltip: "Search",
-                      ),
+                  const SizedBox(height: 2), 
+                  Text(
+                    userName ?? "Guest User",
+                    style: const TextStyle(
+                      fontSize: 22, 
+                      fontWeight: FontWeight.w800, 
+                      color: Color(0xFF243153)
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
+                ],
               ),
-              
-              const SizedBox(width: 12),
 
-              // 3. FILTER BUTTON
-              InkWell(
-                onTap: onFilterTap,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD7FC64), 
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.tune_rounded,
-                    color: Color(0xFF243153),
-                    size: 24,
-                  ),
+              Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: (userProfileImage != null && userProfileImage!.isNotEmpty)
+                      ? CachedNetworkImage(
+                          imageUrl: "$pathWeb/proxy-image/?url=${Uri.encodeComponent(userProfileImage!.startsWith('http') ? userProfileImage! : "$pathWeb/$userProfileImage")}",
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(color: Colors.grey[200]),
+                          errorWidget: (context, url, error) => Container(
+                            color: const Color(0xFF243153),
+                            child: Center(
+                              child: Text(
+                                _getInitials(userName),
+                                style: const TextStyle(color: Color(0xFFD7FC64), fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: const Color(0xFF243153), 
+                          child: Center(
+                            child: Text(
+                              _getInitials(userName),
+                              style: const TextStyle(
+                                color: Color(0xFFD7FC64), 
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
                 ),
               ),
             ],
           ),
-        ),
+
+          const SizedBox(height: 16), 
+
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F6FA),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: searchController,
+                    onSubmitted: onSearchSubmitted,
+                    style: const TextStyle(color: Color(0xFF243153), fontWeight: FontWeight.w600),
+                    decoration: InputDecoration(
+                      hintText: "Search courts...",
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                      prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[400], size: 24),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 11),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              InkWell(
+                onTap: onFilterTap,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 45,
+                  width: 45,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF243153),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF243153).withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      )
+                    ],
+                  ),
+                  child: const Icon(Icons.tune_rounded, color: Color(0xFFD7FC64), size: 22),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

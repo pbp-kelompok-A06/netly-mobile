@@ -18,17 +18,16 @@ class CourtDetailPage extends StatefulWidget {
 
 class _CourtDetailPageState extends State<CourtDetailPage> {
   // State
-  bool isFavorited = false; // Status hati (Merah/Putih)
-  String selectedLabel = "Lainnya"; // Default value DB
-  bool isLoading = false; // Loading saat klik tombol
-  bool isChecking = true; // Loading awal saat cek status ke server
+  bool isFavorited = false;
+  String selectedLabel = "Lainnya";
+  bool isLoading = false;
+  bool isCheckingStatus = true;
 
   final List<String> favoriteLabels = ["Rumah", "Kantor", "Lainnya"];
 
   @override
   void initState() {
     super.initState();
-    // 👇 LOGIC UTAMA: Cek status ke server saat halaman baru dibuka
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final request = context.read<CookieRequest>();
@@ -37,7 +36,37 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
     });
   }
 
-  // Fungsi Cek Status: "Server, lapangan ini ada di list favorit user gak?"
+  void _showCustomSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isError ? Colors.red.shade400 : const Color(0xFF243153), 
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+        duration: const Duration(milliseconds: 1500),
+      ),
+    );
+  }
+
+  // Cek Status
   Future<void> checkFavoriteStatus(CookieRequest request) async {
     try {
       final response = await request.get("$pathWeb/api/favorites/");
@@ -46,47 +75,52 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
       String foundLabel = "Lainnya";
 
       for (var item in response['results']) {
-        // Cek apakah ID Lapangan di list favorit == ID Lapangan halaman ini
-        if (item['lapangan']['id'].toString() == widget.court.id.toString()) {
+        String remoteId = item['lapangan']['id'].toString();
+        String currentId = widget.court.id.toString();
+
+        if (remoteId == currentId) {
           found = true;
-          foundLabel = item['label'] ?? "Lainnya";
+          String serverLabel = item['label'] ?? "Lainnya";
+          
+          if (favoriteLabels.contains(serverLabel)) {
+            foundLabel = serverLabel;
+          } else {
+            foundLabel = favoriteLabels.firstWhere(
+              (element) => element.toLowerCase() == serverLabel.toLowerCase(),
+              orElse: () => "Lainnya",
+            );
+          }
           break;
         }
       }
 
       if (mounted) {
         setState(() {
-          isFavorited = found; // Kalau ketemu, jadi TRUE (Merah)
-          selectedLabel = foundLabel; // Update label sesuai yang disimpan
-          isChecking = false; // Selesai loading
+          isFavorited = found;
+          selectedLabel = foundLabel;
+          isCheckingStatus = false;
         });
       }
     } catch (e) {
-      print("Error checking status: $e");
-      if (mounted) setState(() => isChecking = false);
+      if (mounted) setState(() => isCheckingStatus = false);
     }
   }
 
-  // Helper Translate Label (DB -> Tampilan UI)
   String _getDisplayLabel(String val) {
     if (val == "Rumah") return "Home";
     if (val == "Kantor") return "Office";
     return "Other";
   }
 
-  // Helper URL Gambar (Pakai Proxy Image)
   String getImageUrl() {
     String rawUrl = widget.court.image;
-    // 1. Pastikan Absolute URL
     if (!rawUrl.startsWith('http')) {
        if (rawUrl.startsWith('/')) rawUrl = rawUrl.substring(1);
        rawUrl = "$pathWeb/$rawUrl";
     }
-    // 2. Bungkus dengan Proxy agar muncul di Chrome
     return "$pathWeb/proxy-image/?url=${Uri.encodeComponent(rawUrl)}";
   }
 
-  // Logic Toggle (Klik Hati)
   Future<void> toggleFavorite(CookieRequest request) async {
     setState(() => isLoading = true);
     final url = "$pathWeb/api/favorites/toggle/${widget.court.id}/";
@@ -96,41 +130,35 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
 
       if (response['status'] == 'added') {
         setState(() => isFavorited = true);
-        _showSnackBar("Saved to Favorites", Colors.green);
+        _showCustomSnackBar("Saved to Favorites"); 
       } else if (response['status'] == 'removed') {
         setState(() => isFavorited = false);
-        _showSnackBar("Removed from Favorites", Colors.grey);
+        _showCustomSnackBar("Removed from Favorites"); 
       }
     } catch (e) {
-      _showSnackBar("Login required", Colors.red);
+      _showCustomSnackBar("Login required", isError: true); 
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-  // Logic Update Label Dropdown
   Future<void> updateLabel(CookieRequest request, String newLabel) async {
     setState(() => selectedLabel = newLabel);
+    
     if (!isFavorited) {
       await toggleFavorite(request);
       return;
     }
+
     final url = "$pathWeb/api/favorites/toggle/${widget.court.id}/";
     try {
+      await request.post(url, {}); 
       await request.post(url, jsonEncode({"label": newLabel}));
-      _showSnackBar("Label updated", Colors.blue);
+      
+      _showCustomSnackBar("Label updated to ${_getDisplayLabel(newLabel)}");
     } catch (e) {
-      print("Error updating label: $e");
+      // Silent error
     }
-  }
-
-  void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message, style: const TextStyle(color: Colors.white)),
-      backgroundColor: color,
-      duration: const Duration(seconds: 1),
-      behavior: SnackBarBehavior.floating,
-    ));
   }
 
   @override
@@ -146,27 +174,18 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // === HERO IMAGE (PROXY + CACHED IMAGE) ===
                   Stack(
                     children: [
                       SizedBox(
                         height: 300,
                         width: double.infinity,
                         child: CachedNetworkImage(
-                          imageUrl: getImageUrl(), // Pakai URL Proxy
+                          imageUrl: getImageUrl(),
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(color: Colors.grey[200]),
-                          errorWidget: (context, url, error) => Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.blue.shade400, Colors.blue.shade600],
-                              ),
-                            ),
-                            child: const Center(child: Icon(Icons.sports_tennis, color: Colors.white54, size: 64)),
-                          ),
+                          errorWidget: (context, url, error) => Container(color: Colors.grey[300]),
                         ),
                       ),
-                      // Back Button
                       Positioned(
                         top: 50, left: 16,
                         child: InkWell(
@@ -190,7 +209,6 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                     ],
                   ),
 
-                  // Content
                   Container(
                     transform: Matrix4.translationValues(0, -20, 0),
                     decoration: const BoxDecoration(
@@ -203,19 +221,18 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                       children: [
                         Text(
                           widget.court.name,
-                          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Color(0xFF243153), height: 1.2),
+                          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF243153)),
                         ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             const Icon(Icons.location_on, size: 16, color: Colors.grey),
                             const SizedBox(width: 4),
-                            Expanded(child: Text(widget.court.location, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w500))),
+                            Expanded(child: Text(widget.court.location, style: const TextStyle(color: Colors.grey))),
                           ],
                         ),
                         const SizedBox(height: 20),
 
-                        // === FAVORITE PILL (HEART & DROPDOWN) ===
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
@@ -225,23 +242,20 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Tombol Hati (Penting)
                               InkWell(
-                                onTap: (isLoading || isChecking) ? null : () => toggleFavorite(request),
+                                onTap: (isLoading || isCheckingStatus) ? null : () => toggleFavorite(request),
                                 child: Padding(
                                   padding: const EdgeInsets.all(4.0),
-                                  child: (isChecking) 
+                                  child: (isCheckingStatus) 
                                     ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                                     : Icon(
                                         isFavorited ? Icons.favorite : Icons.favorite_border,
-                                        color: isFavorited ? Colors.red : Colors.grey, // Merah kalau Favorited
-                                        size: 24,
+                                        color: isFavorited ? Colors.red : Colors.grey,
                                       ),
                                 ),
                               ),
                               Container(height: 20, width: 1, color: Colors.grey.shade300, margin: const EdgeInsets.symmetric(horizontal: 8)),
                               
-                              // Dropdown Label
                               DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: selectedLabel,
@@ -251,7 +265,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                                   items: favoriteLabels.map((String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
-                                      child: Text(_getDisplayLabel(value)), // Tampilan UI English
+                                      child: Text(_getDisplayLabel(value)),
                                     );
                                   }).toList(),
                                   onChanged: (newValue) {
@@ -275,8 +289,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
               ),
             ),
           ),
-          
-          // Bottom Bar
+
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -295,7 +308,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                   ],
                 ),
                 ElevatedButton(
-                  onPressed: () {}, // TODO: Booking
+                  onPressed: () {}, 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF243153),
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),

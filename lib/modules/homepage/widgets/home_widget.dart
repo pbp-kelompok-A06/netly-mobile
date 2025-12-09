@@ -10,17 +10,13 @@ class CourtCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // === LOGIC PROXY IMAGE (RAHASIA SUPAYA MUNCUL DI CHROME) ===
     String rawUrl = court.image;
-    
-    // 1. Jika URL relatif (/media/...), jadikan absolut dulu
+
     if (!rawUrl.startsWith('http')) {
        if (rawUrl.startsWith('/')) rawUrl = rawUrl.substring(1);
        rawUrl = "$pathWeb/$rawUrl";
     }
 
-    // 2. Bungkus URL asli ke dalam Proxy Django
-    // encodeComponent() penting agar karakter spesial di URL aman
     String proxyUrl = "$pathWeb/proxy-image/?url=${Uri.encodeComponent(rawUrl)}";
 
     return Container(
@@ -51,14 +47,13 @@ class CourtCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === GAMBAR (PAKAI PROXY URL) ===
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 child: SizedBox(
-                  height: 135,
+                  height: 100,
                   width: double.infinity,
                   child: CachedNetworkImage(
-                    imageUrl: proxyUrl, // 👈 PAKAI URL PROXY
+                    imageUrl: proxyUrl, 
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
                       color: Colors.grey[200],
@@ -81,8 +76,7 @@ class CourtCard extends StatelessWidget {
                   ),
                 ),
               ),
-              
-              // === TEKS INFO (TETAP SAMA) ===
+
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
