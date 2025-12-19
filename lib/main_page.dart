@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/booking/screen/booking_list_screen.dart';
 import 'package:netly_mobile/modules/homepage/screen/home_page.dart';
 import 'package:netly_mobile/modules/homepage/screen/favorite_page.dart';
 import 'package:netly_mobile/modules/homepage/widgets/bottom_nav.dart';
@@ -27,9 +28,7 @@ class _MainPageState extends State<MainPage> {
     Widget bodyContent;
     switch (_selectedIndex) {
       case 0:
-        bodyContent = const Center(
-          child: Text("Halaman Booking (On Progress)"),
-        );
+        bodyContent = const BookingListPage();
         break;
       case 1:
         bodyContent = const Center(child: Text("Halaman Community (On Progress)"));
@@ -38,7 +37,7 @@ class _MainPageState extends State<MainPage> {
         bodyContent = const HomePage();
         break;
       case 3:
-        bodyContent = const Center(child: Text("Halaman Events (On Progress)"));
+        bodyContent = const BookingListPage();
         break;
       case 4:
         bodyContent = const FavoritePage();
