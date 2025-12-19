@@ -279,7 +279,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
               if (result == true) {
                 if (context.mounted) {
                    Navigator.pop(context, true); 
-                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Event updated!")));
                 }
               }
             },
@@ -383,13 +382,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         if (response['action'] == 'join') {
                           isJoined = true;
                           currentParticipants++;
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Join!"), backgroundColor: Colors.green));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully Join!"), backgroundColor: Colors.green));
                         } else {
                           isJoined = false;
                           if (currentParticipants > 0) {
                             currentParticipants--;
                           }
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Berhasil Leave!"), backgroundColor: Colors.red));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully Leave!"), backgroundColor: Colors.red));
                         }
                       });
                    }
