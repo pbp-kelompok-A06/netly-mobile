@@ -103,7 +103,7 @@ class Booking {
     CookieRequest request,
   ) async {
     // Menggunakan pathWeb['netly']
-    final url = "$pathWeb/lapangan/api/lapangan/$id/";
+    final url = "$pathWeb/booking/get_lapangan_detail_json/$id/";
     final response = await request.get(url);
 
 
