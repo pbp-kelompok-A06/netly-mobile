@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import '../model/forum.dart';
-import '../model/post.dart'; 
-import '../../../utils/colors.dart'; 
-import '../widgets/thread_post_card.dart';
-
+import 'package:netly_mobile/modules/community/model/forum.dart';
+import 'package:netly_mobile/modules/community/model/post.dart';
+import 'package:netly_mobile/utils/colors.dart';
+import 'package:netly_mobile/modules/community/widgets/thread_post_card.dart';
 import 'package:netly_mobile/utils/helper.dart';
 
 class ForumPostPage extends StatefulWidget {
   final ForumData forumData;
 
-  const ForumPostPage({super.key, required this.forumData});
+  const ForumPostPage({
+    super.key, 
+    required this.forumData
+  });
 
   @override
   State<ForumPostPage> createState() => _ForumPostPageState();
@@ -33,46 +35,56 @@ class _ForumPostPageState extends State<ForumPostPage> {
 
 
   Future<List<PostData>> fetchPosts(CookieRequest request) async {
-    final String url = '$pathWeb/community/forum/post/${widget.forumData.id}/';
+    try {
+      final String url = '$pathWeb/community/forum/post/${widget.forumData.id}/';
     
-    final response = await request.get(url);
+      final response = await request.get(url);
+      
+      PostResponse postResponse = PostResponse.fromJson(response);
     
-    PostResponse postResponse = PostResponse.fromJson(response);
-   
-    return postResponse.data;
+      return postResponse.data;
+    } catch (e) {
+      debugPrint("Error fetching posts: $e");
+      return [];
+    }
+    
     
   }
 
   Future<void> createPost(CookieRequest request) async {
-    request.headers['X-Requested-With'] = 'XMLHttpRequest';
-    final String url = '$pathWeb/community/create-post/${widget.forumData.id}/';
-    
-    final response = await request.post(url, {
-        'header': _titleController.text,
-        'content': _contentController.text,
-    });
+    try {
+      request.headers['X-Requested-With'] = 'XMLHttpRequest';
+      final String url = '$pathWeb/community/create-post/${widget.forumData.id}/';
+      
+      final response = await request.post(url, {
+          'header': _titleController.text,
+          'content': _contentController.text,
+      });
 
-    if (response['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Thread posted successfully!"),
-            backgroundColor: Colors.green,
-        ));
+      if (response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Thread posted successfully!"),
+              backgroundColor: Colors.green,
+          ));
+          
+          _titleController.clear();
+          _contentController.clear();
+          FocusScope.of(context).unfocus();
+
         
-        // Cleaning input field
-        _titleController.clear();
-        _contentController.clear();
-        FocusScope.of(context).unfocus();
-
-        // Refresh list
-        setState(() {
-            _threadPosts = fetchPosts(request);
-        });
-    } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(response['msg'] ?? "Failed to post thread."),
-            backgroundColor: Colors.red,
-        ));
+          setState(() {
+              _threadPosts = fetchPosts(request);
+          });
+      } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(response['msg'] ?? "Failed to post thread."),
+              backgroundColor: Colors.red,
+          ));
+      }
+    } catch (e){
+      debugPrint("Error creating posts: $e");
     }
+    
   }
 
   
@@ -89,8 +101,12 @@ class _ForumPostPageState extends State<ForumPostPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundCommunity,
       appBar: AppBar(
+        title: Text(
+          widget.forumData.title,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -128,18 +144,20 @@ class _ForumPostPageState extends State<ForumPostPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Input Judul
+                        // title input
                         TextField(
                           controller: _titleController,
+                          maxLength: 255,
                           decoration: const InputDecoration(
                             hintText: "Thread title...",
                             hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black45),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
+                            
                           ),
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textPrimaryCommunity),
                         ),
-                        // Input Isi
+                        // content / description input
                         TextField(
                           controller: _contentController,
                           decoration: const InputDecoration(
@@ -152,7 +170,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
                           minLines: 1,
                         ),
                         const SizedBox(height: 16),
-                        // Tombol Post
+                        // post button
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
@@ -223,16 +241,21 @@ class _ForumPostPageState extends State<ForumPostPage> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(), // Scroll ikut parent
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         final post = snapshot.data![index];
                         return ThreadPostCard(
+                          idPost: post.id,
+                          creatorId: post.user.id,
                           title: post.header,
                           content: post.content,
                           userName: post.user.username,
                           timeAgo: timeAgo(post.createdAt),
+                          onDelete: () => setState(() {
+                            _threadPosts = fetchPosts(request);
+                          })
                         );
                       },
                     ),
