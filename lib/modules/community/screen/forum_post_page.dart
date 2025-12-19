@@ -180,6 +180,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                     content: Text("Please fill in both title and content"),
+                                    backgroundColor: Colors.red,
                                 ));
                               }
                             },

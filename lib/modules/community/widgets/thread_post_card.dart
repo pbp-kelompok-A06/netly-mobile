@@ -34,7 +34,7 @@ class ThreadPostCard extends StatelessWidget {
       if (response['success'] == true && context.mounted) {
         onDelete?.call();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Post deleted successfully!")),
+          const SnackBar(content: Text("Post deleted successfully!"), backgroundColor: Colors.green,),
         );
       }
     } catch (e){

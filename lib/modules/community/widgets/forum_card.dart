@@ -29,7 +29,8 @@ class ForumCard extends StatelessWidget {
       if (response['success'] == true && context.mounted) {
         onRefresh?.call();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Forum deleted successfully!")),
+          const SnackBar(content: Text("Forum deleted successfully!"), backgroundColor: Colors.green,),
+          
         );
       }
     } catch (e){
@@ -45,7 +46,7 @@ class ForumCard extends StatelessWidget {
       if(response['success'] == true){
         onRefresh?.call();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Successfully joined ${data.title}!")),
+          SnackBar(content: Text("Successfully joined ${data.title}!"), backgroundColor: Colors.green,),
         );
       }
     } catch(e){
@@ -61,7 +62,7 @@ class ForumCard extends StatelessWidget {
       if(response['success'] == true){
         onRefresh?.call();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Successfully left ${data.title}!")),
+          SnackBar(content: Text("Successfully left ${data.title}!"), backgroundColor: Colors.green,),
         );
       }
     } catch(e){
