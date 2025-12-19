@@ -135,6 +135,7 @@ class _CreateForumDialogState extends State<CreateForumDialog> {
                     const Text("Title", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     TextFormField(
                       controller: _titleController,
+                      maxLength: 200,
                       decoration: const InputDecoration(
                         hintText: "Enter forum title",
                         hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
