@@ -5,8 +5,19 @@ import 'package:netly_mobile/utils/path_web.dart';
 
 class CreateForumDialog extends StatefulWidget {
   final VoidCallback onForumCreated;
-
-  const CreateForumDialog({super.key, required this.onForumCreated});
+  final String? forumId;
+  final String? initialTitle;
+  final String? initialDesc;
+  final bool isEdit;
+  
+  const CreateForumDialog({
+    super.key, 
+    required this.onForumCreated,
+    this.isEdit = false,
+    this.forumId,
+    this.initialTitle,
+    this.initialDesc
+  });
 
   @override
   State<CreateForumDialog> createState() => _CreateForumDialogState();
@@ -14,36 +25,51 @@ class CreateForumDialog extends StatefulWidget {
 
 class _CreateForumDialogState extends State<CreateForumDialog> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
  
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.initialTitle ?? "");
+    _descriptionController = TextEditingController(text: widget.initialDesc ?? "");
+  }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   Future<void> _submitForum(CookieRequest request) async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
+      String url = widget.isEdit ? 'update-forum/${widget.forumId}' : 'create-forum';
       final response = await request.post(
-        '$pathWeb/community/create-forum/', 
+       
+        '$pathWeb/community/$url/', 
         {
           'title': _titleController.text,
           'description': _descriptionController.text,
         },
       );
 
-
+      String status = widget.isEdit ? 'update' : 'create';
       if (response['success'] == true) {
+
         if (!mounted) return;
         Navigator.pop(context); 
         widget.onForumCreated(); 
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Forum created successfully!"),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Forum ${status}d successfully!"),
           backgroundColor: Colors.green,
         ));
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(response['msg'] ?? "Failed to create forum."),
+          content: Text(response['msg'] ?? "Failed to $status forum."),
           backgroundColor: Colors.red,
         ));
       }
@@ -83,8 +109,8 @@ class _CreateForumDialogState extends State<CreateForumDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(width: 24),
-                  const Text(
-                    "Create a Forum",
+                  Text( 
+                    widget.isEdit ? 'Update a Forum' : 'Create a Forum',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

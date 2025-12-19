@@ -6,6 +6,7 @@ import 'package:netly_mobile/modules/lapangan/service/jadwal_service.dart';
 import 'package:netly_mobile/modules/lapangan/screen/lapangan_edit_page.dart';
 import 'package:netly_mobile/modules/lapangan/screen/jadwal_list_page.dart';
 import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart';
+import 'package:netly_mobile/utils/path_web.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +17,9 @@ class LapanganDetailPage extends StatefulWidget {
     super.key,
     required this.lapanganId,
   });
+
+  
+
 
   @override
   State<LapanganDetailPage> createState() => _LapanganDetailPageState();
@@ -28,6 +32,18 @@ class _LapanganDetailPageState extends State<LapanganDetailPage> {
   Datum? _lapangan;
   String? _errorMessage;
 
+  String getImageUrl() {
+    String rawUrl = _lapangan!.image;
+    if (rawUrl.isEmpty) return "";
+    if (!rawUrl.startsWith('http')) {
+      if (rawUrl.startsWith('/')) {
+        rawUrl = rawUrl.substring(1); // Hapus slash depan
+      }
+      rawUrl = "$pathWeb/$rawUrl";
+    }
+
+    return "$pathWeb/proxy-image/?url=${Uri.encodeComponent(rawUrl)}";
+  }
   @override
   void initState() {
     super.initState();
@@ -195,7 +211,7 @@ class _LapanganDetailPageState extends State<LapanganDetailPage> {
                           flexibleSpace: FlexibleSpaceBar(
                             background: _lapangan!.image.isNotEmpty
                                 ? Image.network(
-                                    _lapangan!.image,
+                                    getImageUrl(),
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Container(

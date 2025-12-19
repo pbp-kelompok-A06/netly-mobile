@@ -146,6 +146,10 @@ class _LapanganListPageState extends State<LapanganListPage> {
     final request = context.watch<CookieRequest>();
     final lapanganService = LapanganService(request);
 
+    final size = MediaQuery.of(context).size;
+    final height = size.height;
+    final width = size.width;
+
     // Check if user is admin
     final isAdmin = lapanganService.isUserAdmin();
 
@@ -207,31 +211,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                 }
 
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'There is an error: ${snapshot.error}',
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {});
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Try Again'),
-                        ),
-                      ],
-                    ),
-                  );
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 }
 
                 if (!snapshot.hasData || snapshot.data == null) {
@@ -241,42 +221,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                 final lapanganList = snapshot.data!.data;
 
                 if (lapanganList.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.sports_tennis,
-                          size: 64,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _searchQuery.isEmpty
-                              ? isAdmin
-                                    ? 'You dont have a court yet'
-                                    : 'There is no court yet'
-                              : 'No results for "$_searchQuery"',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        if (isAdmin && _searchQuery.isEmpty) ...[
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _addLapangan,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add First Field'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF243153),
-                              foregroundColor: const Color(0xFFD7FC64),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
+                  return const Center(child: Text('Data kosong'));
                 }
 
                 return RefreshIndicator(
@@ -288,9 +233,9 @@ class _LapanganListPageState extends State<LapanganListPage> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 1.3,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          mainAxisExtent: 300,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
                         ),
                     itemCount: lapanganList.length,
                     itemBuilder: (context, index) {
@@ -310,13 +255,18 @@ class _LapanganListPageState extends State<LapanganListPage> {
           ),
         ],
       ),
+
+      // --- Floating Action Button dengan Posisi Dinamis ---
       floatingActionButton: isAdmin
-          ? FloatingActionButton.extended(
-              onPressed: _addLapangan,
-              backgroundColor: const Color(0xFFD7FC64),
-              foregroundColor: const Color(0xFF243153),
-              icon: const Icon(Icons.add),
-              label: const Text('Add'),
+          ? Padding(
+              padding: EdgeInsets.only(bottom: height * 0.12),
+              child: FloatingActionButton.extended(
+                onPressed: _addLapangan,
+                backgroundColor: const Color(0xFFD7FC64),
+                foregroundColor: const Color(0xFF243153),
+                icon: const Icon(Icons.add),
+                label: const Text('Add'),
+              ),
             )
           : null,
     );
