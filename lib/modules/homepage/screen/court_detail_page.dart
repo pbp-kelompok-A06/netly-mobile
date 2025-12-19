@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/booking/screen/create_booking_screen.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:netly_mobile/modules/homepage/model/home_model.dart';
@@ -313,7 +314,16 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                 
                 // Tombol Book
                 ElevatedButton(
-                  onPressed: () {}, 
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateBookingScreen(
+                          lapanganId: widget.court.id.toString(), // Kirim ID Lapangan
+                        ),
+                      ),
+                    );
+                  }, 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF243153),
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
