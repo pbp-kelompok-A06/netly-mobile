@@ -102,6 +102,17 @@ class ThreadPostCard extends StatelessWidget {
                           }
                         },
                         itemBuilder: (context) => [
+                          if(seePage != null)
+                          const PopupMenuItem(
+                            value: 'more',
+                            child: Row(
+                              children: [
+                                Icon(Icons.exit_to_app, color: Colors.black54, size: 20),
+                                SizedBox(width: 8),
+                                Text('See More', style: TextStyle(color: Colors.black54)),
+                              ],
+                            ),
+                          ),
                           const PopupMenuItem(
                             value: 'delete',
                             child: Row(
@@ -112,17 +123,7 @@ class ThreadPostCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          if(seePage != null)
-                          const PopupMenuItem(
-                            value: 'more',
-                            child: Row(
-                              children: [
-                                Icon(Icons.exit_to_app, color: Colors.red, size: 20),
-                                SizedBox(width: 8),
-                                Text('See More', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
+                          
                         ],
                     ),
                     const SizedBox(height: 8),

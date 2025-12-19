@@ -193,7 +193,7 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
       future: _fetchRecentPosts(request),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-        if (snapshot.data!.isEmpty) return const Center(child: Text("Tidak ada postingan terbaru."));
+        if (snapshot.data!.isEmpty) return const Center(child: Text("No new posts available."));
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16),

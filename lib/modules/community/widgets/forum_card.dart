@@ -90,11 +90,8 @@ class ForumCard extends StatelessWidget {
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.gradientStartCommunity, AppColors.gradientEndCommunity],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color:  AppColors.gradientStartCommunity,
+         
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -135,7 +132,7 @@ class ForumCard extends StatelessWidget {
                   child: Text(
                     data.description,
                     style: const TextStyle(
-                      color: Colors.white, 
+                      color: AppColors.gradientEndCommunity, 
                       fontSize: 13,
                       height: 1.3,
                     ),
@@ -148,7 +145,7 @@ class ForumCard extends StatelessWidget {
                 data.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                style: const TextStyle(color: AppColors.gradientEndCommunity, fontSize: 12),
               ),
 
             Wrap(
