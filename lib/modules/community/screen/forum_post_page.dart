@@ -133,7 +133,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar
+                  // avatar
                   CircleAvatar(
                     radius: 20,
                     backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=$currentUsername&size=40&background=random'),
