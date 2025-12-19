@@ -26,8 +26,12 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Poppins',
           useMaterial3: true,
         ),
+        debugShowCheckedModeBanner: false,
         initialRoute: AuthRoutes.login,
-        routes: {...AppRoutes.routes, '/main': (context) => const MainPage()},
+        routes: {
+          ...AppRoutes.routes, 
+          '/main': (context) => const MainPage()
+        },
       ),
     );
   }
