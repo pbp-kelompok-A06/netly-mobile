@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,12 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
  late Future<Map<String, dynamic>> _futureScheduleData;
  late BookingService _service;
  final Set<String> _selectedJadwalIds = {};
+
+@override
+  void initState() {
+    super.initState();
+    initializeDateFormatting('id_ID', null);
+  }
 
  @override
  void didChangeDependencies() {
