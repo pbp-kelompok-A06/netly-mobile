@@ -6,7 +6,7 @@ import 'package:netly_mobile/utils/path_web.dart';
 import 'package:netly_mobile/modules/lapangan/model/lapangan_model.dart'
     as Lapangan; // Import package untuk otentikasi
 import 'package:netly_mobile/modules/lapangan/model/jadwal_lapangan_model.dart';
-     // Import variabel pathWeb Anda
+     
 
 // Menggunakan Import Aliasing untuk mengatasi konflik nama kelas 'Datum'
 
