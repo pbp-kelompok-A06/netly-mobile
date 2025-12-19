@@ -163,7 +163,7 @@ class FavoriteCard extends StatelessWidget {
                             "Rp ${court.formattedPrice}",
                             style: const TextStyle(
                               fontSize: 13,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.bold,
                               color: Color(0xFF243153),
                             ),
                           ),
