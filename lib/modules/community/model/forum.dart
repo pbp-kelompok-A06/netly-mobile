@@ -21,7 +21,7 @@ class ForumResponse {
     );
 
     Map<String, dynamic> toJson() => {
-        "sucesss": success,
+        "success": success, 
         "msg": msg,
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
     };
@@ -63,7 +63,14 @@ class ForumData {
     );
 
     Map<String, dynamic> toJson() => { 
+        "id": id,
+        "creator_id": creatorId,
+        "creator_name": creatorName,
         "title": title,
         "description": description,
+        "member_count": memberCount,
+        "is_member": isMember,
+        "created_at": createdAt.toIso8601String(), 
+        "updated_at": updatedAt.toIso8601String(),
     };
 }
