@@ -1,76 +1,58 @@
-import 'dart:convert';
-
-ForumResponse forumResponseFromJson(String str) => ForumResponse.fromJson(json.decode(str));
-String forumResponseToJson(ForumResponse data) => json.encode(data.toJson());
-
 class ForumResponse {
-    bool success;
-    String msg;
-    List<ForumData> data;
+  final bool success;
+  final String msg;
+  final List<ForumData> data;
 
-    ForumResponse({
-        required this.success,
-        required this.msg,
-        required this.data,
-    });
+  ForumResponse({
+    required this.success,
+    required this.msg,
+    required this.data,
+  });
 
-    factory ForumResponse.fromJson(Map<String, dynamic> json) => ForumResponse(
-        success: json["success"], 
-        msg: json["msg"],
-        data: List<ForumData>.from(json["data"].map((x) => ForumData.fromJson(x))),
+  factory ForumResponse.fromJson(Map<String, dynamic> json) {
+    return ForumResponse(
+      success: json["success"],
+      msg: json["msg"],
+      data: json["data"] != null
+          ? List<ForumData>.from(json["data"].map((x) => ForumData.fromJson(x))) : [],
     );
-
-    Map<String, dynamic> toJson() => {
-        "success": success, 
-        "msg": msg,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    };
+  }
 }
 
 class ForumData {
-    String id;
-    String creatorId;
-    String creatorName;
-    String title;
-    String description;
-    int? memberCount;
-    bool? isMember;
-    DateTime createdAt;
-    DateTime updatedAt;
+  final String id;
+  final String creatorId;
+  final String creatorName;
+  final String title;
+  final String description;
+  final int? memberCount;
+  final bool isMember;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-    ForumData({
-        required this.id,
-        required this.creatorId,
-        required this.creatorName,
-        required this.title,
-        required this.description,
-        this.memberCount,
-        this.isMember,
-        required this.createdAt,
-        required this.updatedAt,
-    });
+  ForumData({
+    required this.id,
+    required this.creatorId,
+    required this.creatorName,
+    required this.title,
+    required this.description,
+    this.memberCount,
+    required this.isMember,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
-    factory ForumData.fromJson(Map<String, dynamic> json) => ForumData(
-        id: json["id"],
-        creatorId: json["creator_id"],
-        creatorName: json["creator_name"],
-        title: json["title"],
-        description: json["description"],
-        memberCount: json['member_count'],
-        isMember: json["is_member"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
+  factory ForumData.fromJson(Map<String, dynamic> json) {
+    return ForumData(
+      id: json["id"],
+      creatorId: json["creator_id"],
+      creatorName: json["creator_name"],
+      title: json["title"],
+      description: json["description"],
+      memberCount: json['member_count'],
+      isMember: json["is_member"] ?? false,
+      createdAt: DateTime.tryParse(json["created_at"]) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json["updated_at"]) ?? DateTime.now(),
     );
-
-    Map<String, dynamic> toJson() => { 
-        "id": id,
-        "creator_id": creatorId,
-        "creator_name": creatorName,
-        "title": title,
-        "description": description,
-        "member_count": memberCount,
-        "is_member": isMember,
-        "created_at": createdAt.toIso8601String(), 
-        "updated_at": updatedAt.toIso8601String(),
-    };
+  }
 }

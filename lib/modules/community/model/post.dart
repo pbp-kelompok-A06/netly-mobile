@@ -1,83 +1,71 @@
-import 'dart:convert';
-
-PostResponse postResponseFromJson(String str) => PostResponse.fromJson(json.decode(str));
-String postResponseToJson(PostResponse data) => json.encode(data.toJson());
-
 class PostResponse {
-    bool success;
-    String msg;
-    List<PostData> data;
-    String? currentUserId;
+  final bool success;
+  final String msg;
+  final List<PostData> data;
+  final String? currentUserId;
 
-    PostResponse({
-        required this.success,
-        required this.msg,
-        required this.data,
-        this.currentUserId,
-    });
+  PostResponse({
+    required this.success,
+    required this.msg,
+    required this.data,
+    this.currentUserId,
+  });
 
-    factory PostResponse.fromJson(Map<String, dynamic> json) => PostResponse(
-        success: json["success"],
-        msg: json["msg"],
-        data: List<PostData>.from(json["data"].map((x) => PostData.fromJson(x))),
-        currentUserId: json["current_user_id"],
+  factory PostResponse.fromJson(Map<String, dynamic> json) {
+    return PostResponse(
+      success: json["success"] ,
+      msg: json["msg"],
+      currentUserId: json["current_user_id"],
+      data: json["data"] != null
+          ? List<PostData>.from(json["data"].map((x) => PostData.fromJson(x))) : [],
     );
-
-    Map<String, dynamic> toJson() => {
-        "success": success,
-        "msg": msg,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    };
+  }
 }
 
 class PostData {
-    String id;
-    String header;
-    String content;
-    DateTime createdAt;
-    UserPost user;
-    String? forumName;
+  final String id;
+  final String header;
+  final String content;
+  final DateTime createdAt;
+  final UserPost user;
+  final String forumName;
 
-    PostData({
-        required this.id,
-        required this.header,
-        required this.content,
-        required this.createdAt,
-        required this.user,
-        this.forumName
-    });
+  PostData({
+    required this.id,
+    required this.header,
+    required this.content,
+    required this.createdAt,
+    required this.user,
+    required this.forumName,
+  });
 
-    factory PostData.fromJson(Map<String, dynamic> json) => PostData(
-        id: json["id"],
-        header: json["header"],
-        content: json["content"],
-        forumName: json["forum_name"],
-        createdAt: DateTime.parse(json["created_at"]),
-        user: UserPost.fromJson(json["user"]),
+  factory PostData.fromJson(Map<String, dynamic> json) {
+    return PostData(
+      id: json["id"],
+      header: json["header"],
+      content: json["content"],
+      forumName: json["forum_name"] ?? "General",
+      createdAt: DateTime.tryParse(json["created_at"]) ?? DateTime.now(),
+      user: UserPost.fromJson(json["user"]) ,
     );
-
-    Map<String, dynamic> toJson() => {
-        "header": header,
-        "content": content,
-    };
+  }
 }
 
 class UserPost {
-    String id;
-    String username;
+  final String id;
+  final String username;
 
-    UserPost({
-        required this.id,
-        required this.username,
-    });
+  UserPost({
+    required this.id,
+    required this.username,
+  });
 
-    factory UserPost.fromJson(Map<String, dynamic> json) => UserPost(
-        id: json["id"],
-        username: json["username"],
+  factory UserPost.fromJson(Map<String, dynamic> json) {
+    return UserPost(
+      id: json["id"],
+      username: json["username"],
     );
+  }
 
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "username": username,
-    };
+  
 }
