@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/auth/model/auth_model.dart';
+import 'package:netly_mobile/utils/colors.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -57,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                       controller: _usernameController,
                       decoration: InputDecoration(
                         hintText: "Username",
+                        labelText: "Username",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -77,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: !_passwordShown,
                       decoration: InputDecoration(
                         hintText: "Password",
+                        labelText: "Password",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -113,34 +117,51 @@ class _LoginPageState extends State<LoginPage> {
                             return;
                           }
 
-                          String username = _usernameController.text;
-                          String password = _passwordController.text;
-
-                          final response = await request.login(
+                          try {
+                            final response = await request.login(
                             "$pathWeb/login-ajax/",
-                            jsonEncode({
-                              'username': username,
-                              'password': password,
-                            }),
-                          );
+                              jsonEncode({
+                                'username': _usernameController.text,
+                                'password': _passwordController.text,
+                              }),
+                            );
 
-                          if (request.loggedIn) {
-                            request.jsonData['userData'] = response['data'];
-                            if (context.mounted) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MainPage(),
-                                ),
-                              );
+                            if (request.loggedIn) {
+                              AuthResponse loginRes = AuthResponse.fromJson(response);
+                              request.jsonData['userData'] = loginRes.data?.toJson();
+                              if (context.mounted) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MainPage(),
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (context.mounted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Login Failed'),
+                                    content: Text(response['message']),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
                             }
-                          } else {
+
+                          } catch (e) {
                             if (context.mounted) {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Login Failed'),
-                                  content: Text(response['message']),
+                                  title: const Text('Login Error'),
+                                  content: Text("Request Failed!"),
                                   actions: [
                                     TextButton(
                                       child: const Text('OK'),
@@ -151,13 +172,15 @@ class _LoginPageState extends State<LoginPage> {
                               );
                             }
                           }
+                          
                         },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          backgroundColor: AppColors.gradientStartCommunity
                         ),
-                        child: const Text("Login"),
+                        child: const Text("Login", style: TextStyle(color: AppColors.gradientEndCommunity),),
                       ),
                     ),
 
