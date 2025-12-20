@@ -145,6 +145,11 @@ class _FavoritePageState extends State<FavoritePage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
+    var size = MediaQuery.of(context).size;
+
+    final double itemHeight = 250;
+    final double itemWidth = size.width / 2;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -199,11 +204,11 @@ class _FavoritePageState extends State<FavoritePage> {
                 } else {
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 0.8, 
+                      childAspectRatio: (itemWidth / itemHeight),
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (_, index) {
