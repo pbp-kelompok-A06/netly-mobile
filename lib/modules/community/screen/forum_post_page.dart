@@ -37,9 +37,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
   Future<List<PostData>> fetchPosts(CookieRequest request) async {
     try {
       final String url = '$pathWeb/community/forum/post/${widget.forumData.id}/';
-    
       final response = await request.get(url);
-      
       PostResponse postResponse = PostResponse.fromJson(response);
     
       return postResponse.data;
