@@ -62,7 +62,7 @@ class Booking {
         .map((j) => j['id']?.toString() ?? "${j['tanggal']}_${j['start_main']}")
         .toList();
 
-    // 2. Fetch Detail Lapangan dan Jadwal secara paralel (Concurrent fetching)
+    
 
     // Meneruskan request cookie untuk otentikasi
     final futureLapangan = _fetchLapanganDetail(lapanganId, request);
