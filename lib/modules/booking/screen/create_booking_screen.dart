@@ -10,7 +10,7 @@ import 'package:netly_mobile/modules/booking/services/booking_services.dart';
 // dummy 
 import 'booking_detail_screen.dart';
 
-// --- Palet Warna Modern ---
+
 const Color kPrimaryColor = Color(0xFF243153); // Dark Blue/Grey
 const Color kAccentColor = Color(0xFFD7FC64); // Lime Green
 const Color kSuccessColor = Color(0xFF4CAF50); // Green for Available

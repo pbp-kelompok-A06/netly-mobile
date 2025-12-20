@@ -27,7 +27,7 @@ class BookingRoutes {
     tes4: (context) => CreateBookingScreen(lapanganId: "0847ef1a-00a0-4c8f-bccc-b14572c6541c"),
   };
   // static WidgetBuilder getDetailPageBuilder(Uuid id) {
-  //   // Mengarahkan ke halaman detail dengan ID yang diterima
+  
   //   return (context) => BookingDetailScreen(bookingId: id);
   // }
 }

@@ -36,7 +36,7 @@ https://drive.google.com/drive/folders/1ZavKO5MArsdd4mvhmcku6fB9GIWp51Ro?usp=sha
 https://docs.google.com/spreadsheets/d/1ps7Y-VIe4WkWgU2LCvHjXcCw6QSmWz5ySCnZWBD25xE/edit?usp=sharing
 
 # Tautan Figma
-https://www.figma.com/design/NKrUTgJaI3YfUvom0AVwPK/Untitled?node-id=0-1&t=zV5wKtPf4rfcJr77-1a.com/design/NKrUTgJaI3YfUvom0AVwPK/Untitled?node-id=0-1&t=zV5wKtPf4rfcJr77-1
+https://www.figma.com/design/9zhcGSVU5ImrflFcwTlNyI/Untitled?node-id=0-1&t=a5gGBLIUApeO3UZ9-1
 
 # Daftar Modul
 ## Autentikasi dan Profil Pengguna
