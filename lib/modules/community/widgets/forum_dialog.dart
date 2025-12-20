@@ -125,66 +125,70 @@ class _CreateForumDialogState extends State<CreateForumDialog> {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Title", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    TextFormField(
-                      controller: _titleController,
-                      maxLength: 200,
-                      decoration: const InputDecoration(
-                        hintText: "Enter forum title",
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                        contentPadding: EdgeInsets.symmetric(vertical: 8),
-                        isDense: true,
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: headerColor, width: 2)),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Title", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      TextFormField(
+                        controller: _titleController,
+                        maxLength: 200,
+                        decoration: const InputDecoration(
+                          hintText: "Enter forum title",
+                          hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                          contentPadding: EdgeInsets.symmetric(vertical: 8),
+                          isDense: true,
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: headerColor, width: 2)),
+                        ),
+                        validator: (value) => value == null || value.isEmpty ? 'Title cannot be empty' : null,
                       ),
-                      validator: (value) => value == null || value.isEmpty ? 'Title cannot be empty' : null,
-                    ),
-                    
-                    const SizedBox(height: 24),
+                      
+                      const SizedBox(height: 24),
 
-                    const Text("Description", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 3,
-                      decoration: const InputDecoration(
-                        hintText: "Write a short description...",
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                        contentPadding: EdgeInsets.symmetric(vertical: 8),
-                        isDense: true,
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: headerColor, width: 2)),
+                      const Text("Description", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          hintText: "Write a short description...",
+                          hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                          contentPadding: EdgeInsets.symmetric(vertical: 8),
+                          isDense: true,
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: headerColor, width: 2)),
+                        ),
+                        validator: (value) => value == null || value.isEmpty ? 'Description cannot be empty' : null,
                       ),
-                      validator: (value) => value == null || value.isEmpty ? 'Description cannot be empty' : null,
-                    ),
 
-                    const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                    Center(
-                      child: SizedBox(
-                        width: 150,
-                        height: 45,
-                        child: ElevatedButton(
-                          onPressed: () => _submitForum(request),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: headerColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                            elevation: 0,
+                      Center(
+                        child: SizedBox(
+                          width: 150,
+                          height: 45,
+                          child: ElevatedButton(
+                            onPressed: () => _submitForum(request),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: headerColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              elevation: 0,
+                            ),
+                            child: const Text("Submit", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ),
-                          child: const Text("Submit", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              )
+              
+              
             ),
           ],
         ),
