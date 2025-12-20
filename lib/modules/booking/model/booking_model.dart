@@ -21,7 +21,7 @@ class Booking {
   final String userFullname;
 
   final String statusBook;
-  final double totalPrice;
+  final int totalPrice;
   final DateTime createdAt;
 
   // Menggunakan List JadwalData untuk detail jadwal
@@ -43,6 +43,7 @@ class Booking {
 
   // Metode untuk membuat objek Booking LENGKAP dari raw JSON yang hanya berisi ID.
   static Future<Booking> fromRawJson(
+    
     Map<String, dynamic> json,
     CookieRequest request,
   ) async {
@@ -83,13 +84,14 @@ class Booking {
         userId: userId,
         userFullname: userFullname,
         statusBook: json['status_book'],
-        totalPrice: double.parse(json['total_price'].toString()),
+        totalPrice: double.parse(json['total_price'].toString()).toInt(),
         createdAt: DateTime.parse(json['created_at']),
         jadwal: detailsJadwal,
       );
     } catch (e) {
       if (kDebugMode) {
-        print('Error fetching booking details: $e');
+        print("masuk baru");
+        print('Error baru lagi fetching booking details: $StackTrace');
       }
       rethrow;
     }
@@ -106,10 +108,14 @@ class Booking {
     final url = "$pathWeb/booking/get_lapangan_detail_json/$id/";
     final response = await request.get(url);
 
-
+    var data = response['data'];
 
     if (response['status'] == 'success') {
-      return Lapangan.Datum.fromJson(response['data']);
+      if (data != null && data['price'] != null) {
+      
+      data['price'] = (data['price'] as num).toInt();
+    }
+      return Lapangan.Datum.fromJson(data);
     } else {
       throw Exception(
         'Gagal memuat detail Lapangan ID: $id. Pesan: ${response['message']}',

@@ -13,48 +13,58 @@ class BookingService {
   BookingService({required this.request});
 
   Future<Map<String, dynamic>> fetchAvailableSchedules(
-    String lapanganId,
-  ) async {
-    final url = '$pathWeb/booking/get_booking_data_flutter/$lapanganId/';
+  String lapanganId,
+) async {
+  final url = '$pathWeb/booking/get_booking_data_flutter/$lapanganId/';
 
-    final response = await request.get(url);
+  final response = await request.get(url);
 
-    if (response is List) {
-      final jsonResponse = response.first;
+  if (response is List) {
+    final jsonResponse = response.first;
+    
+    // 1. Ambil data lapangan dan buat salinan Map yang bisa dimodifikasi
+    var lapanganData = Map<String, dynamic>.from(jsonResponse['lapangan']);
 
-      final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(
-        jsonResponse['lapangan'] as Map<String, dynamic>,
-      );
+    // 2. Intersepsi: Paksa 'price' menjadi int agar tidak error di HP
+    if (lapanganData['price'] != null) {
+      lapanganData['price'] = (lapanganData['price'] as num).toInt();
+    }
 
-      final List<JadwalData> jadwalList =
-          (jsonResponse['jadwal_list'] as List)
-              .map((j) => JadwalData.fromJson(j as Map<String, dynamic>))
-              .toList();
+    final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(lapanganData);
 
-      return {'lapangan': lapangan, 'jadwalList': jadwalList};
-    } else if (response is Map) {
-      final Map<String, dynamic> jsonResponse =
-          response as Map<String, dynamic>;
+    final List<JadwalData> jadwalList = (jsonResponse['jadwal_list'] as List)
+        .map((j) => JadwalData.fromJson(j as Map<String, dynamic>))
+        .toList();
 
-      if (jsonResponse.containsKey('lapangan')) {
-        final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(
-          jsonResponse['lapangan'] as Map<String, dynamic>,
-        );
-        final List<JadwalData> jadwalList =
-            (jsonResponse['jadwal_list'] as List)
-                .map((j) => JadwalData.fromJson(j as Map<String, dynamic>))
-                .toList();
+    return {'lapangan': lapangan, 'jadwalList': jadwalList};
+  } else if (response is Map) {
+    final Map<String, dynamic> jsonResponse = response as Map<String, dynamic>;
 
-        return {'lapangan': lapangan, 'jadwalList': jadwalList};
+    if (jsonResponse.containsKey('lapangan')) {
+      // 3. Lakukan hal yang sama untuk branch Map: Intersepsi data lapangan
+      var lapanganData = Map<String, dynamic>.from(jsonResponse['lapangan']);
+      
+      if (lapanganData['price'] != null) {
+        // Konversi dari num (int/double) ke int secara eksplisit
+        lapanganData['price'] = (lapanganData['price'] as num).toInt();
       }
 
-      throw Exception(
-        'Gagal memuat jadwal: ${jsonResponse['message'] ?? 'Unknown Error'}',
-      );
-    } else {
-      throw Exception('Gagal memuat jadwal: Invalid response format.');
+      final Lapangan.Datum lapangan = Lapangan.Datum.fromJson(lapanganData);
+      
+      final List<JadwalData> jadwalList = (jsonResponse['jadwal_list'] as List)
+          .map((j) => JadwalData.fromJson(j as Map<String, dynamic>))
+          .toList();
+
+      return {'lapangan': lapangan, 'jadwalList': jadwalList};
     }
+
+    throw Exception(
+      'Gagal memuat jadwal: ${jsonResponse['message'] ?? 'Unknown Error'}',
+    );
+  } else {
+    throw Exception('Gagal memuat jadwal: Invalid response format.');
   }
+}
 
   Future<List<Booking>> fetchAllBookings(CookieRequest request) async {
     // Ganti dengan endpoint API Django Anda untuk mendapatkan list booking mentah
@@ -102,7 +112,6 @@ class BookingService {
     String lapanganId,
     List<String> jadwalIds,
   ) async {
-
     final url = '$pathWeb/booking/create_booking_flutter/';
 
     final Map<String, dynamic> body = {
@@ -112,7 +121,7 @@ class BookingService {
     };
 
     final response = await request.postJson(url, jsonEncode(body));
-    
+
     if (response is Map) {
       final Map<String, dynamic> data = response as Map<String, dynamic>;
       if (data['success'] == true) {
@@ -133,7 +142,6 @@ class BookingService {
     final url = '$pathWeb/booking/booking_detail/$bookingId/complete/';
 
     final response = await request.postJson(url, jsonEncode({}));
-    
 
     if (response is Map) {
       final Map<String, dynamic> data = response as Map<String, dynamic>;
@@ -162,14 +170,13 @@ class BookingService {
   Future<Map<dynamic, dynamic>> deleteBookingAsAdmin(String bookingId) async {
     final url =
         '$pathWeb/booking/delete_booking/$bookingId/'; // Sesuaikan dengan URL Django Anda
-    
-    
+
     // Melakukan POST request
     final response = await request.postJson(
       url,
       jsonEncode({}), // POST body kosong karena booking_id ada di URL
     );
-    
+
     // Cek apakah respons memiliki kunci 'success'
     // return JsonResponse({'success': False, 'message': 'Booking tidak ditemukan.'}, status=404)
     if (response is Map && response['success'] == true) {

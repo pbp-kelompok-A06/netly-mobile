@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/booking/screen/booking_list_screen.dart';
+import 'package:netly_mobile/modules/community/screen/forum_show_page.dart';
+import 'package:netly_mobile/modules/event/screen/event_page.dart';
 import 'package:netly_mobile/modules/homepage/screen/home_page.dart';
 import 'package:netly_mobile/modules/homepage/screen/favorite_page.dart';
 import 'package:netly_mobile/modules/homepage/widgets/bottom_nav.dart';
+import 'package:netly_mobile/modules/lapangan/screen/lapangan_list_page.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -25,25 +30,38 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     Widget bodyContent;
     switch (_selectedIndex) {
       case 0:
         bodyContent = const BookingListPage();
         break;
       case 1:
-        bodyContent = const Center(child: Text("Halaman Community (On Progress)"));
+        bodyContent = const ForumShowPage();
         break;
       case 2:
-        bodyContent = const HomePage();
+        if(request.jsonData['userData']['role'] == 'admin'){
+          bodyContent = const LapanganListPage();
+        }else{
+          bodyContent = const HomePage();
+        }
+
         break;
       case 3:
-        bodyContent = const BookingListPage();
+        bodyContent = const EventPage();
         break;
       case 4:
         bodyContent = const FavoritePage();
         break;
       default:
-        bodyContent = const HomePage();
+       if(request.jsonData['userData']['role'] == 'admin'){
+          bodyContent = const LapanganListPage();
+        }else{
+          bodyContent = const HomePage();
+        } 
+        break;
+
     }
 
     return Scaffold(

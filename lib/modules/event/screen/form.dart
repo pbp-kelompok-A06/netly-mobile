@@ -26,6 +26,9 @@ class _EventFormPageState extends State<EventFormPage> {
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
+  final TextStyle _inputStyle = const TextStyle(fontSize: 12); 
+  final TextStyle _labelStyle = const TextStyle(fontSize: 12, color: Colors.grey);
+
   @override
   void initState() {
     super.initState();
@@ -97,9 +100,11 @@ class _EventFormPageState extends State<EventFormPage> {
             children: [
                 // name
                 TextFormField(
-                  initialValue: _name, // pre-fill value
+                  initialValue: _name, // pre-fill value 
+                  style: _inputStyle,
                   decoration: InputDecoration(
                     labelText: "Event Name",
+                    labelStyle: _labelStyle,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onChanged: (value) => setState(() => _name = value),
@@ -109,9 +114,11 @@ class _EventFormPageState extends State<EventFormPage> {
   
                 // location
                 TextFormField(
-                  initialValue: _location,
+                  initialValue: _location, 
+                  style: _inputStyle,
                   decoration: InputDecoration(
                     labelText: "Location",
+                    labelStyle: _labelStyle,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onChanged: (value) => setState(() => _location = value),
@@ -125,9 +132,11 @@ class _EventFormPageState extends State<EventFormPage> {
                     Expanded(
                       child: TextFormField(
                         controller: _startDateController,
-                        readOnly: true,
+                        readOnly: true, 
+                        style: _inputStyle,
                         decoration: InputDecoration(
                           labelText: "Start Date",
+                          labelStyle: _labelStyle,
                           prefixIcon: const Icon(Icons.calendar_today),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         ),
@@ -140,9 +149,11 @@ class _EventFormPageState extends State<EventFormPage> {
                     Expanded(
                       child: TextFormField(
                         controller: _endDateController,
-                        readOnly: true,
+                        readOnly: true, 
+                        style: _inputStyle,
                         decoration: InputDecoration(
                           labelText: "End Date",
+                          labelStyle: _labelStyle,
                           prefixIcon: const Icon(Icons.calendar_today),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         ),
@@ -157,8 +168,10 @@ class _EventFormPageState extends State<EventFormPage> {
                 // max participants
                 TextFormField(
                   initialValue: _maxParticipants > 0 ? _maxParticipants.toString() : "",
+                  style: _inputStyle,
                   decoration: InputDecoration(
                     labelText: "Max Participants",
+                    labelStyle: _labelStyle,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   keyboardType: TextInputType.number,
@@ -173,9 +186,11 @@ class _EventFormPageState extends State<EventFormPage> {
   
                 // image URL
                 TextFormField(
-                  initialValue: _imageUrl,
+                  initialValue: _imageUrl, 
+                  style: _inputStyle,
                   decoration: InputDecoration(
                     labelText: "Image URL",
+                    labelStyle: _labelStyle,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onChanged: (value) => setState(() => _imageUrl = value),
@@ -184,10 +199,12 @@ class _EventFormPageState extends State<EventFormPage> {
   
                 // Description
                 TextFormField(
-                  initialValue: _description,
+                  initialValue: _description, 
+                  style: _inputStyle,
                   maxLines: 3,
                   decoration: InputDecoration(
                     labelText: "Description",
+                    labelStyle: _labelStyle,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onChanged: (value) => setState(() => _description = value),

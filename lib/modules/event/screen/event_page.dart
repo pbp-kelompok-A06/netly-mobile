@@ -209,22 +209,25 @@ class _EventPageState extends State<EventPage> {
           ),
 
       floatingActionButton: isAdmin 
-        ? FloatingActionButton.extended(
-            onPressed: () async {
-              final result = await showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const EventFormPage();
-                },
-              );
-              if (result == true) {
-                setState(() {});
-              }
-            },
-            label: const Text('Add Event', style: TextStyle(fontWeight: FontWeight.bold)),
-            icon: const Icon(Icons.add),
-            backgroundColor: _primaryBlue,
-            foregroundColor: _accentGreen,
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: 75.0), 
+            child: FloatingActionButton.extended(
+              onPressed: () async {
+                final result = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const EventFormPage();
+                  },
+                );
+                if (result == true) {
+                  setState(() {});
+                }
+              },
+              label: const Text('Add Event', style: TextStyle(fontWeight: FontWeight.bold)),
+              icon: const Icon(Icons.add),
+              backgroundColor: _primaryBlue,
+              foregroundColor: _accentGreen,
+            ),
           )
         : null, // tombol hilang untuk user biasa (non admin)
     );
