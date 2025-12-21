@@ -48,8 +48,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
     // ambil tinggi layar
     final double screenHeight = MediaQuery.of(context).size.height;
     bool isFull = currentParticipants >= widget.event.maxParticipants;
+    // untuk cek apakah suatu event udah lewat atau belum
+    bool isPastEvent = widget.event.endDate.isBefore(DateTime.now());
     // tombol mati kalau udah penuh dan usernya belum join
-    bool isButtonDisabled = isFull && !isJoined;
+    bool isButtonDisabled = (isFull && !isJoined) || isPastEvent;
+
+    // untuk teks di button sesuai kondisi
+    String buttonText;
+      if (isPastEvent) {
+        buttonText = "Event Ended";
+      } else if (isFull && !isJoined) {
+        buttonText = "Quota Full";
+      } else {
+        buttonText = isJoined ? "Leave Event" : "Join Event Now";
+      }
 
     return Scaffold(
       backgroundColor: Colors.white, 
@@ -186,17 +198,16 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       Container(
                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                          decoration: BoxDecoration(
-                           color: currentParticipants >= widget.event.maxParticipants 
-                              ? Colors.red.withOpacity(0.2) 
-                              : _accentGreen.withOpacity(0.5),
+                           color: isPastEvent 
+                              ? Colors.grey.withOpacity(0.3) // abu-abu kalau lewat
+                              : (isFull ? Colors.red.withOpacity(0.1) : _accentGreen.withOpacity(0.5)),
                            borderRadius: BorderRadius.circular(20),
                          ),
                          child: Text(
-                           currentParticipants >= widget.event.maxParticipants ? "Penuh" : "Tersedia",
+                           isPastEvent ? "Ended" : (isFull ? "Full" : "Open"),
                            style: TextStyle(
-                             color: currentParticipants >= widget.event.maxParticipants ? Colors.red : _primaryBlue,
-                             fontWeight: FontWeight.bold,
-                             fontSize: 12
+                             color: isPastEvent ? Colors.black54 : (isFull ? Colors.red : _primaryBlue),
+                             fontWeight: FontWeight.bold, fontSize: 12
                            ),
                          ),
                       )
@@ -244,8 +255,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -7))],
               ),
               child: isAdmin 
-                ? _buildAdminButtons()  // show button buat admin
-                : _buildUserButton(isButtonDisabled, request), // show button buat non-admin user
+                ? _buildAdminButtons(context, request) // show button buat admin
+                : _buildUserButton(context, request, isButtonDisabled, buttonText), // show button buat non-admin user
             ),
           ),
         ],
@@ -253,7 +264,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     );
   }
 
-  Widget _buildAdminButtons() {
+  Widget _buildAdminButtons(BuildContext context, CookieRequest request) {
     return Column(
       mainAxisSize: MainAxisSize.min, 
       children: [
@@ -353,7 +364,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
   }
 
   // button untuk user non admin -> join or leave event
-  Widget _buildUserButton(bool isButtonDisabled, CookieRequest request) {
+  Widget _buildUserButton(BuildContext context, CookieRequest request, bool isButtonDisabled, String text){
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -368,7 +379,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 0,
         ),
-        onPressed: isButtonDisabled 
+        onPressed: isButtonDisabled && !isJoined
             ? null 
             : () async {
                 final response = await request.postJson(
@@ -395,9 +406,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 }
               },
         child: Text(
-          isButtonDisabled 
-              ? "Kuota Penuh" 
-              : (isJoined ? "Leave Event" : "Join Event Now"),
+          text,
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),

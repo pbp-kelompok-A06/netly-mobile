@@ -150,43 +150,6 @@ class _JadwalListPageState extends State<JadwalListPage> {
     }
   }
 
-  Future<void> _toggleAvailability(JadwalData jadwal) async {
-    try {
-      final result = await _jadwalService.toggleAvailability(
-        jadwalId: jadwal.id,
-        isAvailable: !jadwal.isAvailable,
-      );
-
-      if (mounted) {
-        if (result['success']) {
-          setState(() {}); // Refresh
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message']),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message']),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isAdmin = _lapanganService.isUserAdmin();
@@ -243,14 +206,6 @@ class _JadwalListPageState extends State<JadwalListPage> {
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF243153),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedDate = null;
-                      });
-                    },
-                    child: const Text('Delete Filter'),
                   ),
                 ],
               ),
@@ -457,21 +412,6 @@ class _JadwalListPageState extends State<JadwalListPage> {
                       icon: const Icon(Icons.edit, size: 18),
                       label: const Text('Edit'),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _toggleAvailability(jadwal),
-                      icon: Icon(
-                        jadwal.isAvailable ? Icons.lock : Icons.lock_open,
-                        size: 18,
-                      ),
-                      label: Text(jadwal.isAvailable ? 'Non-active' : 'Activate'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: jadwal.isAvailable ? Colors.orange : Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),

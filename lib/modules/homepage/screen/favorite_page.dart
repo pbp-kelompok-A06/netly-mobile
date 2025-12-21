@@ -202,7 +202,12 @@ class _FavoritePageState extends State<FavoritePage> {
                   );
                 } else {
                   return GridView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.only(
+                        top: 16, 
+                        left: 16, 
+                        right: 16, 
+                        bottom: 100, 
+                      ),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
