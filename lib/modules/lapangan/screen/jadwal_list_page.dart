@@ -244,14 +244,6 @@ class _JadwalListPageState extends State<JadwalListPage> {
                       color: Color(0xFF243153),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedDate = null;
-                      });
-                    },
-                    child: const Text('Delete Filter'),
-                  ),
                 ],
               ),
             ),
@@ -457,21 +449,6 @@ class _JadwalListPageState extends State<JadwalListPage> {
                       icon: const Icon(Icons.edit, size: 18),
                       label: const Text('Edit'),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _toggleAvailability(jadwal),
-                      icon: Icon(
-                        jadwal.isAvailable ? Icons.lock : Icons.lock_open,
-                        size: 18,
-                      ),
-                      label: Text(jadwal.isAvailable ? 'Non-active' : 'Activate'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: jadwal.isAvailable ? Colors.orange : Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
