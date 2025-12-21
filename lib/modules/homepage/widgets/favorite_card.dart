@@ -8,10 +8,13 @@ class FavoriteCard extends StatelessWidget {
   final Favorite favoriteItem;
   final Function(String) onRemove;
 
+  final VoidCallback? onCardTap;
+
   const FavoriteCard({
     super.key,
     required this.favoriteItem,
     required this.onRemove,
+    this.onCardTap,
   });
 
   @override
@@ -60,14 +63,8 @@ class FavoriteCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CourtDetailPage(court: court),
-              ),
-            );
-          },
+          onTap: onCardTap,
+          
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

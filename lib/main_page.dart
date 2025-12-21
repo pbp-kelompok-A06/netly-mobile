@@ -20,11 +20,14 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 2; // Default Home
   bool _isHomePressed = false;
 
+  final GlobalKey<HomePageState> _homeKey = GlobalKey<HomePageState>();
+
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
   }
 
   void _onHomeTapped() {
+    _homeKey.currentState?.resetToInitial();
     setState(() => _selectedIndex = 2);
   }
 
@@ -44,7 +47,7 @@ class _MainPageState extends State<MainPage> {
         if(request.jsonData['userData']['role'] == 'admin'){
           bodyContent = const LapanganListPage();
         }else{
-          bodyContent = const HomePage();
+          bodyContent = HomePage(key: _homeKey);
         }
 
         break;
@@ -58,7 +61,7 @@ class _MainPageState extends State<MainPage> {
        if(request.jsonData['userData']['role'] == 'admin'){
           bodyContent = const LapanganListPage();
         }else{
-          bodyContent = const HomePage();
+          bodyContent = HomePage(key: _homeKey);
         } 
         break;
 
