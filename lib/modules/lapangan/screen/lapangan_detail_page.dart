@@ -405,8 +405,53 @@ class _LapanganDetailPageState extends State<LapanganDetailPage> {
                                       );
                                     }
 
-                                    // Show first 3 jadwal only
-                                    final jadwalList = snapshot.data!.data.take(3).toList();
+                                    // Filter upcoming schedules and sort by date
+                                    final now = DateTime.now();
+                                    final today = DateTime(now.year, now.month, now.day);
+
+                                    // Get upcoming schedules (today and future)
+                                    final upcomingJadwal = snapshot.data!.data
+                                        .where((jadwal) {
+                                          final jadwalDate = DateTime(
+                                            jadwal.tanggal.year,
+                                            jadwal.tanggal.month,
+                                            jadwal.tanggal.day,
+                                          );
+                                          return jadwalDate.isAtSameMomentAs(today) || 
+                                                jadwalDate.isAfter(today);
+                                        })
+                                        .toList();
+
+                                    // Sort by date ascending (nearest first), then by start time
+                                    upcomingJadwal.sort((a, b) {
+                                      final dateComparison = a.tanggal.compareTo(b.tanggal);
+                                      if (dateComparison != 0) return dateComparison;
+                                      return a.startMain.compareTo(b.startMain);
+                                    });
+
+                                    // Take first 3 upcoming schedules
+                                    final jadwalList = upcomingJadwal.take(3).toList();
+
+                                    // If no upcoming schedules, show message
+                                    if (jadwalList.isEmpty) {
+                                      return Card(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            children: [
+                                              const Text('No upcoming schedule'),
+                                              if (isAdmin) ...[
+                                                const SizedBox(height: 8),
+                                                ElevatedButton(
+                                                  onPressed: _navigateToJadwal,
+                                                  child: const Text('Add Schedule'),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }
 
                                     return Column(
                                       children: jadwalList.map((jadwal) {
