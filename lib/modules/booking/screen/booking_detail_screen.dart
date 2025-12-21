@@ -18,6 +18,9 @@ class BookingDetailScreen extends StatefulWidget {
 class _BookingDetailScreenState extends State<BookingDetailScreen> {
   late Future<Booking> _futureBooking;
   late BookingService _service;
+  
+  
+  bool _isDataChanged = false;
 
   @override
   void didChangeDependencies() {
@@ -45,14 +48,25 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     );
   }
 
+  Future<void> _onCompletePayment() async {
+    try {
+      await _service.completePayment(widget.bookingId.toString());
+      
+      
+      setState(() {
+        _isDataChanged = true;
+      });
+      
+      _showSnackBar('Pembayaran berhasil dikonfirmasi!', isError: false);
+      _fetchBookingDetail();
+    } catch (e) {
+      _showSnackBar(e.toString(), isError: true);
+    }
+  }
+
   Widget _buildDetail(Booking booking) {
     final bool isPending = booking.statusBook == 'pending';
-    
-    final formatter = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp',
-      decimalDigits: 0,
-    );
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
     Color statusColor;
     Color statusBgColor;
@@ -72,56 +86,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         break;
     }
 
-    Widget actionButton = const SizedBox.shrink();
-    if (isPending) {
-      actionButton = Padding(
-        padding: const EdgeInsets.only(top: 30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade100,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.shade300)
-              ),
-              child: const Text(
-                'LAKUKAN PEMBAYARAN KE REKENING 123-456-789 AN. NETLY-SPOTIPE',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () async {
-                try {
-                  await _service.completePayment(widget.bookingId.toString());
-                  _showSnackBar('Pembayaran berhasil dikonfirmasi!', isError: false);
-                  _fetchBookingDetail();
-                } catch (e) {
-                  _showSnackBar(e.toString(), isError: true);
-                }
-              },
-              icon: const Icon(Icons.check_circle_outline, color: Color(0xFF243153)),
-              label: const Text('Konfirmasi Pembayaran'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD7FC64),
-                foregroundColor: const Color(0xFF243153),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                elevation: 5,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -129,22 +93,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         children: [
           Text(
             booking.lapangan.name,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF243153),
-            ),
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF243153)),
           ),
           const SizedBox(height: 8),
           Chip(
-            label: Text(
-              booking.statusBook.toUpperCase(),
-              style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
-            ),
+            label: Text(booking.statusBook.toUpperCase(), style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
             backgroundColor: statusBgColor,
           ),
           const Divider(height: 30, thickness: 1),
-
           Card(
             elevation: 4,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -162,9 +118,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
           Card(
             elevation: 4,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -182,59 +136,58 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               ),
             ),
           ),
-          
           const SizedBox(height: 30),
-
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF243153),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                 BoxShadow(
-                  color: const Color(0xFFD7FC64).withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 10,
-                ),
-              ]
+                color: const Color(0xFF243153),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(color: const Color(0xFFD7FC64).withOpacity(0.3), spreadRadius: 2, blurRadius: 10),
+                ]
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                
-                const Expanded(
-                  child: Text(
-                    'TOTAL HARGA',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ),
-                Text(
-                  formatter.format(booking.totalPrice),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFFD7FC64),
-                  ),
-                ),
+                const Expanded(child: Text('TOTAL HARGA', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white))),
+                Text(formatter.format(booking.totalPrice), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFFD7FC64))),
               ],
             ),
           ),
-          actionButton,
+          if (isPending)
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(color: Colors.yellow.shade100, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.orange.shade300)),
+                    child: const Text('LAKUKAN PEMBAYARAN KE REKENING 123-456-789 AN. NETLY-SPOTIPE', style: TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _onCompletePayment,
+                    icon: const Icon(Icons.check_circle_outline, color: Color(0xFF243153)),
+                    label: const Text('Konfirmasi Pembayaran'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD7FC64),
+                      foregroundColor: const Color(0xFF243153),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
   }
 
   Widget _buildSectionHeader(String title) {
-    return Text(
-      title.toUpperCase(),
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF243153),
-        letterSpacing: 0.5,
-      ),
-    );
+    return Text(title.toUpperCase(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF243153), letterSpacing: 0.5));
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
@@ -250,10 +203,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                Text(
-                  value,
-                  style: const TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600),
-                ),
+                Text(value, style: const TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
@@ -266,28 +216,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD7FC64).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFD7FC64).withOpacity(0.5)),
-      ),
+      decoration: BoxDecoration(color: const Color(0xFFD7FC64).withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFD7FC64).withOpacity(0.5))),
       child: Row(
         children: [
           const Icon(Icons.access_time, size: 20, color: Color(0xFF243153)),
           const SizedBox(width: 12),
-          
-          Expanded(
-            child: Text(
-              DateFormat('d MMM y').format(jadwal.tanggal).toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF243153)),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+          Expanded(child: Text(DateFormat('d MMM y').format(jadwal.tanggal).toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF243153)), overflow: TextOverflow.ellipsis)),
           const SizedBox(width: 8),
-          Text(
-            '${jadwal.startMain}:00 - ${jadwal.endMain}:00',
-            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF243153)),
-          ),
+          Text('${jadwal.startMain}:00 - ${jadwal.endMain}:00', style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF243153))),
         ],
       ),
     );
@@ -295,35 +231,45 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detail Booking'),
-        backgroundColor: const Color(0xFF243153),
-        foregroundColor: const Color(0xFFD7FC64),
-        elevation: 0,
-      ),
-      body: FutureBuilder<Booking>(
-        future: _futureBooking,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFF243153)));
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  'Gagal memuat detail booking: ${snapshot.error.toString().replaceFirst('Exception: ', '')}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.red),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop && _isDataChanged) {
+          
+          
+          
+          
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Detail Booking'),
+          backgroundColor: const Color(0xFF243153),
+          foregroundColor: const Color(0xFFD7FC64),
+          elevation: 0,
+          leading: BackButton(
+            onPressed: () => Navigator.pop(context, _isDataChanged),
+          ),
+        ),
+        body: FutureBuilder<Booking>(
+          future: _futureBooking,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Color(0xFF243153)));
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text('Gagal memuat: ${snapshot.error.toString()}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)),
                 ),
-              ),
-            );
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('Detail Booking tidak ditemukan.'));
-          } else {
-            return _buildDetail(snapshot.data!);
-          }
-        },
+              );
+            } else if (!snapshot.hasData) {
+              return const Center(child: Text('Data tidak ditemukan.'));
+            } else {
+              return _buildDetail(snapshot.data!);
+            }
+          },
+        ),
       ),
     );
   }
