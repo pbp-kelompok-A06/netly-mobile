@@ -5,6 +5,9 @@ import 'package:netly_mobile/modules/lapangan/widgets/lapangan_card.dart';
 import 'package:netly_mobile/modules/lapangan/screen/lapangan_form_page.dart';
 import 'package:netly_mobile/modules/lapangan/screen/lapangan_detail_page.dart';
 import 'package:netly_mobile/modules/lapangan/screen/lapangan_edit_page.dart';
+import 'package:netly_mobile/modules/auth/screen/login_page.dart';
+import 'package:netly_mobile/utils/path_web.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +26,23 @@ class _LapanganListPageState extends State<LapanganListPage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogout(BuildContext context, CookieRequest request) async {
+    final response = await request.logout("$pathWeb/logout-ajax/");
+
+    if (context.mounted) {
+      if (response['status'] == 'success') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   void _showDetail(Datum lapangan) {
@@ -141,6 +161,15 @@ class _LapanganListPageState extends State<LapanganListPage> {
     });
   }
 
+  Widget _buildDefaultAvatar() {
+    return Container(
+      color: const Color(0xFF243153),
+      child: const Center(
+        child: Icon(Icons.person, color: Color(0xFFD7FC64), size: 24),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -148,23 +177,177 @@ class _LapanganListPageState extends State<LapanganListPage> {
 
     final size = MediaQuery.of(context).size;
     final height = size.height;
-    final width = size.width;
 
     // Check if user is admin
     final isAdmin = lapanganService.isUserAdmin();
 
+    // Get user data
+    String userName = "Guest User";
+    String userImage = "";
+
+    if (request.loggedIn) {
+      if (request.jsonData.containsKey('userData')) {
+        userName = request.jsonData['userData']['username'] ?? 
+                   request.jsonData['userData']['full_name'] ?? 
+                   request.jsonData['username'] ?? "User"; 
+        
+        userImage = request.jsonData['userData']['profile_picture'] ?? "";
+      } else {
+        userName = request.jsonData['username'] ?? "User";
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          isAdmin ? 'My Court' : 'List of Badminton Courts',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFF243153),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      backgroundColor: Colors.grey[50],
       body: Column(
         children: [
+          // Top Header with Logout Button
+          Container(
+            color: const Color(0xFF243153),
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 45, 
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD7FC64),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "N", 
+                            style: TextStyle(
+                              color: Color(0xFF243153), 
+                              fontWeight: FontWeight.bold, 
+                              fontSize: 26
+                            )
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Hello,", 
+                              style: TextStyle(
+                                fontSize: 12, 
+                                color: Colors.white70, 
+                                fontWeight: FontWeight.w500, 
+                                height: 1.0
+                              )
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              userName,
+                              style: const TextStyle(
+                                fontSize: 16, 
+                                fontWeight: FontWeight.bold, 
+                                color: Color(0xFFD7FC64), 
+                                height: 1.2
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Profile Menu with Logout
+                PopupMenuButton<String>(
+                  offset: const Offset(0, 45),
+                  elevation: 2,
+                  color: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  constraints: const BoxConstraints.tightFor(width: 110),
+                  
+                  child: Container(
+                    width: 45, 
+                    height: 45,
+                    margin: const EdgeInsets.only(left: 8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFD7FC64), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05), 
+                          blurRadius: 8, 
+                          offset: const Offset(0, 2)
+                        )
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: (userImage.isNotEmpty)
+                          ? CachedNetworkImage(
+                              imageUrl: "$pathWeb/proxy-image/?url=${Uri.encodeComponent(userImage.startsWith('http') ? userImage : "$pathWeb/$userImage")}",
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(color: Colors.grey[200]),
+                              errorWidget: (context, url, error) => _buildDefaultAvatar(),
+                            )
+                          : _buildDefaultAvatar(),
+                    ),
+                  ),
+                  
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: 'logout',
+                      height: 32,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout_rounded, color: Colors.red, size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            "Log Out", 
+                            style: TextStyle(
+                              color: Colors.red, 
+                              fontWeight: FontWeight.normal, 
+                              fontSize: 12
+                            )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onSelected: (value) async {
+                    if (value == 'logout') {
+                      await _handleLogout(context, request);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // Title Section
+          Container(
+            width: double.infinity,
+            color: const Color(0xFF243153),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+            child: Text(
+              isAdmin ? 'My Court' : 'List of Badminton Courts',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFD7FC64),
+              ),
+            ),
+          ),
+
           // Search Bar
           Container(
             color: const Color(0xFF243153),
@@ -229,11 +412,16 @@ class _LapanganListPageState extends State<LapanganListPage> {
                     setState(() {});
                   },
                   child: GridView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      16,
+                      16,
+                      isAdmin ? 100 : 16, // Extra bottom padding for FAB
+                    ),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          mainAxisExtent: 300,
+                          mainAxisExtent: 330, // Increased from 300 to 330
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
@@ -256,16 +444,18 @@ class _LapanganListPageState extends State<LapanganListPage> {
         ],
       ),
 
-      // --- Floating Action Button dengan Posisi Dinamis ---
+      // --- Floating Action Button dengan Posisi Fixed ---
       floatingActionButton: isAdmin
           ? Padding(
-              padding: EdgeInsets.only(bottom: height * 0.12),
+              padding: EdgeInsets.only(bottom: height * 0.128),
               child: FloatingActionButton.extended(
                 onPressed: _addLapangan,
-                backgroundColor: const Color(0xFFD7FC64),
-                foregroundColor: const Color(0xFF243153),
+                backgroundColor: const Color(0xFF243153),
+                foregroundColor: const Color(0xFFD7FC64),
                 icon: const Icon(Icons.add),
-                label: const Text('Add'),
+                label: const Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                elevation: 4,
+                
               ),
             )
           : null,
