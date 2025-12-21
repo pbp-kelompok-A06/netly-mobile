@@ -342,7 +342,7 @@ class _JadwalListPageState extends State<JadwalListPage> {
   }
 
   Widget _buildJadwalCard(JadwalData jadwal, bool isAdmin) {
-    final isPast = jadwal.tanggal.isBefore(DateTime.now().subtract(const Duration(days: 1)));
+    final isPast = jadwal.tanggal.isBefore(DateTime.now().subtract(const Duration(days: 0)));
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

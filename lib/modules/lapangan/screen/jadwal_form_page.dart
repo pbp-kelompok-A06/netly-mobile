@@ -140,7 +140,7 @@ class _JadwalFormPageState extends State<JadwalFormPage> {
     // Check if date is not in the past (for create mode)
     if (!_isEditMode) {
       final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
+      final today = DateTime(now.year, now.month, now.day, now.hour, now.minute);
       final selected = DateTime(
         _selectedDate.year, 
         _selectedDate.month, 
@@ -149,7 +149,7 @@ class _JadwalFormPageState extends State<JadwalFormPage> {
         _startTime.minute,
         );
       
-      if (selected.isAfter(today)) {
+      if (selected.isBefore(today)) {
         return 'The date cannot be in the past';
       }
     }
