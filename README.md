@@ -1,11 +1,19 @@
+# Netly
+[![Build Status](https://app.bitrise.io/app/706d15d4-2df7-40a9-a644-0e41cb04becf/status.svg?token=xGTihNfko71o_nAc_9SU9w&branch=main)](https://app.bitrise.io/app/706d15d4-2df7-40a9-a644-0e41cb04becf)
+
+## Download
+Download aplikasi versi terbaru: [Download APK](https://app.bitrise.io/app/706d15d4-2df7-40a9-a644-0e41cb04becf/installable-artifacts/0ade3885b4f45918/public-install-page/9c5a3bd3cc78d6a2a89666f2b0d4b00d)
+
+
+## Video Promosi
+Saksikan iklan / promosi video kami: [Netly - Advertisement Video](https://drive.google.com/file/d/1L4M8WNeBNlD_qNF1a6MD6bWq0pF91MtO/view?usp=drivesdk)
+
 # Kelompok A06
 - Cathlin Abigail Elfably (2406418774)
 - Edlyn Marva (2406410494)
 - Evan Haryo Widodo (2406435824)
 - Khalisa Adzkiyah (2406418995)
 - Nisyyah Azzahra (2406495823)
-
-
 
 # Latar Belakang Aplikasi
 **Netly** adalah aplikasi yang dibuat untuk mempermudah pencarian dan pemesanan lapangan badminton yang semakin banyak diminati masyarakat luas. Melalui netly, pengguna dapat:
@@ -27,7 +35,7 @@ Aplikasi ini menggunakan dataset dari https://ayo.co.id/venues. Pengambilan data
 - Harga tempat
 - Link gambar
 ## Tautan dataset
-https://drive.google.com/drive/folders/1ZavKO5MArsdd4mvhmcku6fB9GIWp51Ro?usp=sharing
+[sumber dataset hasil scrap](https://drive.google.com/drive/folders/1ZavKO5MArsdd4mvhmcku6fB9GIWp51Ro?usp=sharing)
 
 # Tautan Web Aplikasi
 [https://evan-haryo-netly.pbp.cs.ui.ac.id/](url)
@@ -39,8 +47,8 @@ https://docs.google.com/spreadsheets/d/1ps7Y-VIe4WkWgU2LCvHjXcCw6QSmWz5ySCnZWBD2
 https://www.figma.com/design/9zhcGSVU5ImrflFcwTlNyI/Untitled?node-id=0-1&t=a5gGBLIUApeO3UZ9-1
 
 # Daftar Modul
-## Autentikasi dan Profil Pengguna
-Modul ini berperan dalam autentikasi pengguna dalam sign up maupun sign in. Saat pertama kali registrasi, pengguna akan diminta untuk membuat username dan password, setelah itu user diminta untuk memasukan beberapa data diri opsional, seperti lokasi dan foto. Setelah berhasil sign up atau sign in, user akan diarahkan ke halaman utama. Modul ini juga akan handle pengaturan profile pengguna untuk mengubah data diri yang dimasukan di awal.
+## Autentikasi (Modul bersama, implementasi di flutter: Evan)
+Modul ini berperan dalam autentikasi pengguna dalam sign up maupun sign in. Saat pertama kali registrasi, pengguna akan diminta untuk membuat username dan password, setelah itu user diminta untuk memasukan beberapa data diri opsional, seperti lokasi dan foto. Setelah berhasil sign up atau sign in, user akan diarahkan ke halaman utama.
 
 
 ## Home Page (Khalisa)
