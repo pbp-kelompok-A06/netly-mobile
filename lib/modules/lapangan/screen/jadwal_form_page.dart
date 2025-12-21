@@ -90,6 +90,7 @@ class _JadwalFormPageState extends State<JadwalFormPage> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _startTime,
+      initialEntryMode: TimePickerEntryMode.inputOnly, 
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -114,6 +115,7 @@ class _JadwalFormPageState extends State<JadwalFormPage> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _endTime,
+      initialEntryMode: TimePickerEntryMode.inputOnly,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
