@@ -46,26 +46,23 @@ class LapanganCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias, 
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
+            // Image - Fixed height
+            SizedBox(
+              height: 100, 
+              width: double.infinity,
               child: lapangan.image.isNotEmpty
                   ? Image.network(
                       getImageUrl(),
-                      height: 80,
-                      width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          height: 80,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -76,14 +73,13 @@ class LapanganCard extends StatelessWidget {
                           ),
                           child: const Icon(
                             Icons.sports_tennis,
-                            size: 64,
+                            size: 50,
                             color: Colors.white54,
                           ),
                         );
                       },
                     )
                   : Container(
-                      height: 80,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [Colors.blue.shade400, Colors.blue.shade600],
@@ -91,102 +87,149 @@ class LapanganCard extends StatelessWidget {
                       ),
                       child: const Icon(
                         Icons.sports_tennis,
-                        size: 64,
+                        size: 50,
                         color: Colors.white54,
                       ),
                     ),
             ),
 
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text(
-                    lapangan.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Location
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        size: 16,
-                        color: Colors.grey,
+            // Content - Flexible height with Expanded
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title - Max 2 lines
+                    Text(
+                      lapangan.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
                       ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          lapangan.location,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Price
-                  Text(
-                    '${(lapangan.price)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      maxLines: 2, 
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 4),
+                    const SizedBox(height: 6), 
 
-                  // Admin name
-                  Text(
-                    'Oleh: ${lapangan.adminName}',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-
-                  // Admin actions
-                  if (isAdmin) ...[
-                    const SizedBox(height: 12),
+                    // Location
                     Row(
                       children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: onEdit,
-                            icon: const Icon(Icons.edit, size: 8),
-                            label: const Text('Edit'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                            ),
-                          ),
+                        const Icon(
+                          Icons.location_on,
+                          size: 14, 
+                          color: Colors.grey,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: onDelete,
-                            icon: const Icon(Icons.delete, size: 8),
-                            label: const Text('Hapus'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            lapangan.location,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12, 
+                              height: 1.2,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 6), 
+
+                    // Price - Using formatPrice method
+                    Text(
+                      formatPrice(lapangan.price), 
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Admin name
+                    Text(
+                      'Oleh: ${lapangan.adminName}',
+                      style: const TextStyle(
+                        fontSize: 11, 
+                        color: Colors.grey,
+                        height: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis, 
+                    ),
+
+                    const Spacer(), 
+
+                    // Admin actions - COLORFUL BUTTONS
+                    if (isAdmin) ...[
+                      const SizedBox(height: 8), 
+                      Row(
+                        children: [
+                          // Edit Button - Navy Blue with Lime Green text
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: onEdit,
+                              label: const Text(
+                                'Edit',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF243153), // Navy blue
+                                foregroundColor: const Color(0xFFD7FC64), // Lime green
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                                minimumSize: const Size(0, 36),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          
+                          // Delete Button - Red background with white text
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: onDelete,
+                              label: const Text(
+                                'Delete',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade600,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                                minimumSize: const Size(0, 36),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ],
