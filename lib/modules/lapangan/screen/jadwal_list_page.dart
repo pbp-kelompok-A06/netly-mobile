@@ -150,43 +150,6 @@ class _JadwalListPageState extends State<JadwalListPage> {
     }
   }
 
-  Future<void> _toggleAvailability(JadwalData jadwal) async {
-    try {
-      final result = await _jadwalService.toggleAvailability(
-        jadwalId: jadwal.id,
-        isAvailable: !jadwal.isAvailable,
-      );
-
-      if (mounted) {
-        if (result['success']) {
-          setState(() {}); // Refresh
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message']),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message']),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isAdmin = _lapanganService.isUserAdmin();
