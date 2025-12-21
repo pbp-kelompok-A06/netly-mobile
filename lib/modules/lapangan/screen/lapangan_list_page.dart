@@ -204,7 +204,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
           // Top Header with Logout Button
           Container(
             color: const Color(0xFF243153),
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 25, 20, 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -213,8 +213,8 @@ class _LapanganListPageState extends State<LapanganListPage> {
                   child: Row(
                     children: [
                       Container(
-                        width: 45, 
-                        height: 45,
+                        width: 30, 
+                        height: 30,
                         decoration: BoxDecoration(
                           color: const Color(0xFFD7FC64),
                           borderRadius: BorderRadius.circular(10),
@@ -225,7 +225,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                             style: TextStyle(
                               color: Color(0xFF243153), 
                               fontWeight: FontWeight.bold, 
-                              fontSize: 26
+                              fontSize: 20
                             )
                           ),
                         ),
@@ -239,7 +239,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                             const Text(
                               "Hello,", 
                               style: TextStyle(
-                                fontSize: 12, 
+                                fontSize: 10, 
                                 color: Colors.white70, 
                                 fontWeight: FontWeight.w500, 
                                 height: 1.0
@@ -249,7 +249,7 @@ class _LapanganListPageState extends State<LapanganListPage> {
                             Text(
                               userName,
                               style: const TextStyle(
-                                fontSize: 16, 
+                                fontSize: 10, 
                                 fontWeight: FontWeight.bold, 
                                 color: Color(0xFFD7FC64), 
                                 height: 1.2
@@ -274,8 +274,8 @@ class _LapanganListPageState extends State<LapanganListPage> {
                   constraints: const BoxConstraints.tightFor(width: 110),
                   
                   child: Container(
-                    width: 45, 
-                    height: 45,
+                    width: 30, 
+                    height: 30,
                     margin: const EdgeInsets.only(left: 8),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -337,11 +337,11 @@ class _LapanganListPageState extends State<LapanganListPage> {
           Container(
             width: double.infinity,
             color: const Color(0xFF243153),
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
             child: Text(
               isAdmin ? 'My Court' : 'List of Badminton Courts',
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFD7FC64),
               ),
@@ -351,36 +351,54 @@ class _LapanganListPageState extends State<LapanganListPage> {
           // Search Bar
           Container(
             color: const Color(0xFF243153),
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Container(
+              height: 45, 
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
               ),
-              onSubmitted: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
+              child: TextField(
+                controller: _searchController,
+                textInputAction: TextInputAction.search,
+                style: const TextStyle(
+                  color: Color(0xFF243153), 
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search courts...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[400], 
+                    fontSize: 14, 
+                    fontWeight: FontWeight.normal,
+                  ),
+                  prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[400], size: 22),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(Icons.clear, color: Colors.grey[400], size: 20),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        )
+                      : null,
+                  filled: false,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+                onSubmitted: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                  FocusScope.of(context).unfocus(); // Tutup keyboard setelah search
+                },
+              ),
             ),
           ),
 
