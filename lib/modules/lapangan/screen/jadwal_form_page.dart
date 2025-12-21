@@ -139,9 +139,15 @@ class _JadwalFormPageState extends State<JadwalFormPage> {
     if (!_isEditMode) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final selected = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+      final selected = DateTime(
+        _selectedDate.year, 
+        _selectedDate.month, 
+        _selectedDate.day,
+        _startTime.hour,
+        _startTime.minute,
+        );
       
-      if (selected.isBefore(today)) {
+      if (selected.isAfter(today)) {
         return 'The date cannot be in the past';
       }
     }
