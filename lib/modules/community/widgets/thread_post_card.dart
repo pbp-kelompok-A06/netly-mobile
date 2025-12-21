@@ -89,7 +89,7 @@ class ThreadPostCard extends StatelessWidget {
                       ),
                       softWrap: true,  
                     ),
-                    if (creatorId == request.jsonData['userData']['id'])
+
                       PopupMenuButton<String>(
                         icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
                         padding: EdgeInsets.zero,
@@ -113,6 +113,7 @@ class ThreadPostCard extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (creatorId == request.jsonData['userData']['id'])
                           const PopupMenuItem(
                             value: 'delete',
                             child: Row(
