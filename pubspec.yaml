@@ -85,8 +85,10 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logo_netly.png"
+  image_path: "assets/images/icon_netly.jpg"
   min_sdk_android: 21
+  adaptive_icon_background: "#1B243D"
+  adaptive_icon_foreground: "assets/images/icon_netly.jpg"
   
   # To add assets to your application, add an assets section, like this:
   # assets:
