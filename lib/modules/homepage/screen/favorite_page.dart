@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/homepage/screen/court_detail_page.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:netly_mobile/modules/homepage/model/home_model.dart';
@@ -13,7 +14,7 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
-  // State Filter (Default '' artinya All)
+  // State Filter 
   String _selectedLabel = ''; 
   
   final Color navyColor = const Color(0xFF243153);
@@ -63,14 +64,12 @@ class _FavoritePageState extends State<FavoritePage> {
             ),
           ],
         ),
-        
-        // Style Melayang & Rounded
+
         behavior: SnackBarBehavior.floating, 
         backgroundColor: isError ? Colors.red.shade400 : const Color(0xFF243153), 
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        
-        // Atur posisi melayang (di atas navbar)
+
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 30), 
         duration: const Duration(milliseconds: 1500), 
       ),
@@ -212,9 +211,25 @@ class _FavoritePageState extends State<FavoritePage> {
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (_, index) {
+                      final favoriteItem = snapshot.data![index];
+
                       return FavoriteCard(
-                        favoriteItem: snapshot.data![index],
+                        favoriteItem: favoriteItem,
                         onRemove: (id) => removeFavorite(request, id),
+
+                        onCardTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CourtDetailPage(court: favoriteItem.lapangan), 
+                            ),
+                          );
+
+                          if (mounted) {
+                            setState(() {
+                            });
+                          }
+                        },
                       );
                     },
                   );

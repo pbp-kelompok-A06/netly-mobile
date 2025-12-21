@@ -52,9 +52,12 @@ class Datum {
         name: json["name"],
         location: json["location"],
         description: json["description"],
-        price: json["price"],
-        image: json["image"],
-        adminName: json["admin_name"],
+        price: (json["price"] is int) 
+            ? json["price"] 
+            : (json["price"] as double).toInt(), 
+        image: json["image"] ?? "", 
+        adminName: json["admin_name"] ,
+
     );
 
     Map<String, dynamic> toJson() => {

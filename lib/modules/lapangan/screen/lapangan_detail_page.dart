@@ -476,7 +476,7 @@ class _LapanganDetailPageState extends State<LapanganDetailPage> {
                                         child: ElevatedButton.icon(
                                           onPressed: _handleEdit,
                                           icon: const Icon(Icons.edit),
-                                          label: const Text('Edit Court'),
+                                          label: const Text('Edit Court', style: TextStyle(fontWeight: FontWeight.bold)),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: const Color(0xFF243153),
                                             foregroundColor: const Color(0xFFD7FC64),
@@ -489,7 +489,7 @@ class _LapanganDetailPageState extends State<LapanganDetailPage> {
                                         child: ElevatedButton.icon(
                                           onPressed: _handleDelete,
                                           icon: const Icon(Icons.delete),
-                                          label: const Text('Delete'),
+                                          label: const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.red,
                                             foregroundColor: Colors.white,
