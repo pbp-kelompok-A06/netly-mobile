@@ -12,16 +12,27 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   // State Filter
   String? _location; // Untuk Dropdown
   String? _minPrice;
   String? _maxPrice;
+
+  void resetToInitial() {
+    setState(() {
+      _searchController.clear(); // Hapus teks search
+      _location = null; // Reset dropdown
+      _minPrice = null; // Reset harga
+      _maxPrice = null;
+      FocusManager.instance.primaryFocus
+          ?.unfocus(); // Tutup keyboard jika terbuka
+    });
+  }
 
   Future<List<Court>> fetchCourts(CookieRequest request) async {
     // Bangun URL dengan parameter Filter
@@ -96,15 +107,17 @@ class _HomePageState extends State<HomePage> {
     String userImage = "";
 
     if (request.loggedIn) {
-        if (request.jsonData.containsKey('userData')) {
-            userName = request.jsonData['userData']['username'] ?? 
-                       request.jsonData['userData']['full_name'] ?? 
-                       request.jsonData['username'] ?? "User"; 
-            
-            userImage = request.jsonData['userData']['profile_picture'] ?? "";
-        } else {
-            userName = request.jsonData['username'] ?? "User";
-        }
+      if (request.jsonData.containsKey('userData')) {
+        userName =
+            request.jsonData['userData']['username'] ??
+            request.jsonData['userData']['full_name'] ??
+            request.jsonData['username'] ??
+            "User";
+
+        userImage = request.jsonData['userData']['profile_picture'] ?? "";
+      } else {
+        userName = request.jsonData['username'] ?? "User";
+      }
     }
 
     return Column(
