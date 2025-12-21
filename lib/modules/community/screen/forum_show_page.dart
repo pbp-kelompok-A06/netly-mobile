@@ -82,8 +82,8 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
           final allForums = snapshot.data!;
           final userId = request.jsonData['userData']?['id'] ?? -1;
 
-          final joinedForums = allForums.where((f) => f.isMember ?? false).toList();
-          final exploreForums = allForums.where((f) => !(f.isMember ?? false)).toList();
+          final joinedForums = allForums.where((f) => f.isMember ).toList();
+          final exploreForums = allForums.where((f) => !(f.isMember )).toList();
           final myForums = allForums.where((f) => f.creatorId == userId).toList();
 
           return TabBarView(
@@ -209,7 +209,7 @@ class _ForumShowPageState extends State<ForumShowPage> with SingleTickerProvider
               userName: post.user.username,
               timeAgo: timeAgo(post.createdAt),
               content: post.content,
-              forumName: post.forumName ?? "General",
+              forumName: post.forumName,
               onDelete: () => setState(() {}),
               seePage: () {
                 try {

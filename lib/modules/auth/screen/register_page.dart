@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:netly_mobile/modules/auth/model/auth_model.dart';
+import 'package:netly_mobile/utils/colors.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -66,6 +68,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _usernameController,
                       decoration: InputDecoration(
                         hintText: "Username",
+                        labelText: "Username",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -85,6 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _fullNameController,
                       decoration: InputDecoration(
                         hintText: "Fullname",
+                        labelText: "Fullname",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -104,6 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _locationController,
                       decoration: InputDecoration(
                         hintText: "Location",
+                        labelText: "Location (Optional)",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -117,6 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _profilePictureController,
                       decoration: InputDecoration(
                         hintText: "Profile Picture",
+                        labelText: "Profile Picture (Optional)",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -127,7 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           if (uriCheck == null ||
                               !uriCheck.hasScheme ||
                               !uriCheck.hasAuthority) {
-                            return "Profile picture harus dalam link url";
+                            return "Profile picture must be a url link!";
                           }
                         }
 
@@ -143,6 +149,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       obscureText: !_passwordShown,
                       decoration: InputDecoration(
                         hintText: "Password",
+                        labelText: "Password",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -180,6 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       obscureText: !_confirmPasswordShown,
                       decoration: InputDecoration(
                         hintText: "Confirm Password",
+                        labelText: "Confirm Password",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -220,50 +228,74 @@ class _RegisterPageState extends State<RegisterPage> {
                             return;
                           }
 
-                          final response = await request.login(
-                            "$pathWeb/register-ajax/",
-                            jsonEncode({
-                              'username': _usernameController.text,
-                              'password1': _passwordController.text,
-                              'password2': _confirmPasswordController.text,
-                              'full_name': _fullNameController.text,
-                              'location': _locationController.text,
-                              'profile_picture': _profilePictureController.text,
-                            }),
-                          );
-                          if (request.loggedIn) {
-                            request.jsonData['userData'] = response['data'];
+                          try {
+                            final response = await request.login(
+                              "$pathWeb/register-ajax/",
+                              jsonEncode({
+                                'username': _usernameController.text,
+                                'password1': _passwordController.text,
+                                'password2': _confirmPasswordController.text,
+                                'full_name': _fullNameController.text,
+                                'location': _locationController.text,
+                                'profile_picture': _profilePictureController.text,
+                            }));
 
-                            if (context.mounted) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MainPage(),
-                                ),
-                              );
+                            if (request.loggedIn) {
+                              AuthResponse registerRes = AuthResponse.fromJson(response);
+                              request.jsonData['userData'] = registerRes.data?.toJson();
+                              if (context.mounted) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MainPage(),
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (context.mounted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Register Failed'),
+                                    content: Text(response['message']),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
                             }
-                          } else {
+
+                          } catch (e) {
                             if (context.mounted) {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Register Failed'),
-                                  content: Text(response['message']),
+                                  title: const Text('Register Error'),
+                                  content: Text("Request Failed!"),
                                   actions: [
                                     TextButton(
                                       child: const Text('OK'),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
+                                      onPressed: () => Navigator.pop(context),
                                     ),
                                   ],
                                 ),
                               );
                             }
                           }
-                        },
 
-                        child: Text("Register"),
+                          
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: AppColors.gradientStartCommunity
+                        ),
+                        child: Text("Register", style: TextStyle(color: AppColors.gradientEndCommunity),),
                       ),
                     ),
 
