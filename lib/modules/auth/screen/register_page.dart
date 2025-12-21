@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:netly_mobile/modules/auth/model/auth_model.dart';
+import 'package:netly_mobile/modules/auth/screen/login_page.dart';
 import 'package:netly_mobile/utils/colors.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:netly_mobile/modules/auth/route/auth_route.dart';
 import 'package:netly_mobile/utils/path_web.dart';
 import 'package:netly_mobile/main_page.dart';
 
@@ -244,12 +244,36 @@ class _RegisterPageState extends State<RegisterPage> {
                               AuthResponse registerRes = AuthResponse.fromJson(response);
                               request.jsonData['userData'] = registerRes.data?.toJson();
                               if (context.mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MainPage(),
+                                 showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Register Succeed'),
+                                    content: Text("Welcome to Netly, ${request.jsonData['userData']['username']}!"),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const MainPage()),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 );
+
+                                Future.delayed(const Duration(seconds: 3), () {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const MainPage()),
+                                    );
+                                  }
+                                });
                               }
                             } else {
                               if (context.mounted) {
@@ -303,10 +327,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: AuthRoutes.routes[AuthRoutes.login]!,
+                            builder: (context) => const LoginPage(),
                           ),
                         );
                       },
